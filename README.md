@@ -14,7 +14,7 @@
         <td>202109567</td>
     </tr>
   <tr>
-        <td>Marcos Sebastian</td>
+        <td>Marco Sebastian</td>
         <td>202004822</td>
     </tr>
         <tr>
@@ -26,8 +26,8 @@
         <td>202106003</td>
     </tr>
   <tr>
-        <td>Alejandro </td>
-        <td></td>
+        <td>Alejandro Perez</td>
+        <td>201712602</td>
     </tr>
 </table>
 </div>
