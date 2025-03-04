@@ -1,14 +1,99 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+
 function Register() {
+    const [nombres, setNombres] = useState<string>('');
+    const [apellidos, setApellidos] = useState<string>('');
+    const [fotoPerfil, setFotoPerfil] = useState<File | null>(null);
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [confirmPassword, setConfirmPassword] = useState<string>('');
+    const [fechaNacimiento, setFechaNacimiento] = useState<string>('');
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Validaciones básicas
+        if (!nombres || !apellidos || !email || !password || !confirmPassword || !fechaNacimiento) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Por favor, completa todos los campos.',
+            });
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Las contraseñas no coinciden.',
+            });
+            return;
+        }
+
+        // Crear un FormData para enviar archivos y otros datos
+        const formData = new FormData();
+        formData.append('nombres', nombres);
+        formData.append('apellidos', apellidos);
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('fechaNacimiento', fechaNacimiento);
+        if (fotoPerfil) {
+            formData.append('fotoPerfil', fotoPerfil);
+        }
+
+        try {
+            const response = await fetch('https://tu-api.com/register', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Registro exitoso
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Registro exitoso!',
+                    text: 'Tu cuenta ha sido creada correctamente.',
+                }).then(() => {
+                    // Guardar usuario en sessionStorage
+                    sessionStorage.setItem('user', JSON.stringify(data));
+                    navigate('/'); // Redirigir a la página principal
+                });
+            } else {
+                // Mostrar mensaje de error
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Hubo un problema al registrar tu cuenta.',
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un problema al intentar registrar tu cuenta.',
+            });
+        }
+    };
+
     return (
         <section className="register-bg">
             <div className="registerContainer">
-                <form>
+                <form onSubmit={handleSubmit}>
                     <h1 id="registerTitle" className='display-1'>Registro</h1>
                     <input
                         type="text"
                         id="nombres"
                         className='form-control'
                         placeholder='Ingresa tu nombre'
+                        value={nombres}
+                        onChange={(e) => setNombres(e.target.value)}
                         required
                     /><br />
 
@@ -17,15 +102,18 @@ function Register() {
                         id="apellidos"
                         className='form-control'
                         placeholder='Ingresa tu apellido'
+                        value={apellidos}
+                        onChange={(e) => setApellidos(e.target.value)}
                         required
                     /><br />
 
-                    <label htmlFor="fotoPerfil">Ingresa la foto que aparecera en tu perfil</label>
+                    <label htmlFor="fotoPerfil">Ingresa la foto que aparecerá en tu perfil</label>
                     <input
                         type="file"
                         id="fotoPerfil"
                         className='form-control'
                         accept="image/*"
+                        onChange={(e) => setFotoPerfil(e.target.files ? e.target.files[0] : null)}
                     /><br />
 
                     <input
@@ -33,6 +121,8 @@ function Register() {
                         id="email"
                         className='form-control'
                         placeholder='Ingresa tu correo electrónico'
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         required
                     /><br />
 
@@ -41,6 +131,8 @@ function Register() {
                         id="password"
                         className='form-control'
                         placeholder='Ingresa tu contraseña'
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         required
                     /><br />
 
@@ -49,6 +141,8 @@ function Register() {
                         id="confirmPassword"
                         className='form-control'
                         placeholder='Confirma tu contraseña'
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                         required
                     /><br />
 
@@ -57,6 +151,8 @@ function Register() {
                         type="date"
                         id="fechaNacimiento"
                         className='form-control'
+                        value={fechaNacimiento}
+                        onChange={(e) => setFechaNacimiento(e.target.value)}
                         required
                     /><br />
 
