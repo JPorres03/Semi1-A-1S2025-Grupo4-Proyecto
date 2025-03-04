@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import Navbar from "../Navbar/Navbar";
 import Sidebar from "../Sidebar/Sidebar";
 import Books from "./Books/Books";
@@ -39,7 +40,26 @@ function Startpage({ data }: { data: Book[] }) {
         setContent(<Manager data={data} />);
         break;
       case "logout":
-        navigate("/login");
+        // Mostrar confirmación con SweetAlert2
+        Swal.fire({
+          title: "¿Estás seguro?",
+          text: "¿Realmente deseas cerrar sesión?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Sí, cerrar sesión",
+          cancelButtonText: "Cancelar",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Borrar el usuario de sessionStorage
+            sessionStorage.removeItem("user");
+            // Redirigir al login
+            navigate("/login");
+          }
+        });
+        break;
+      default:
         break;
     }
   };

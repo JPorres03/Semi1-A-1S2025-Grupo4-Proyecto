@@ -52,9 +52,8 @@ function Details({ data }: BooksProps) {
           <p className="text-muted">Año: {book.Año}</p>
           {/* Opción para adquirir o leer el libro */}
           <div className="mt-4">
-            <button className="btn btn-primary me-2">Leer libro</button>
-            <button className="btn btn-success me-2">Adquirir libro</button>
-            <button className="btn btn-warning me-2" onClick={()=>{navigate(-1)}} >Regresar</button>
+            {book.Estado ? <button className="btn btn-primary me-2">Leer libro</button> : <button className="btn btn-success me-2">Adquirir libro</button>}
+            <button className="btn btn-warning me-2" onClick={() => { navigate(-1) }} >Regresar</button>
           </div>
         </div>
       </div>
