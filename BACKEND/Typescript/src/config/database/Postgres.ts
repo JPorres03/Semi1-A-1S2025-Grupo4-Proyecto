@@ -1,11 +1,12 @@
 import { Pool } from "pg";
 
-const pool = new Pool({
-  user: "Administrador",
+export const pool = new Pool({
+  user: "administrador",
   host: "ebookvault-db.cw1cg86wap20.us-east-1.rds.amazonaws.com",
-  database: "ebookvault-db",
+  database: "ebookvaultSS1",
   password: "Practica1Semi1",
   port: 5432, 
+  ssl: { rejectUnauthorized: false }
 });
 
 export const connectPg= async() =>{
