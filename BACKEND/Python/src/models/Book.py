@@ -1,0 +1,15 @@
+from src.utils.db_connection import db
+from sqlalchemy.orm import relationship
+
+
+class Book(db.Model):
+    __tablename__="libros"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre = db.Column(db.String)
+    autor = db.Column(db.String)
+    sinopsis = db.Column(db.String)
+    portada_url = db.Column(db.String)
+    pdf_url = db.Column(db.String)
+    anio_publicacion = db.Column(db.Date)
+    adquisiciones = relationship("Adquisicion", back_populates="libro")
+    libros_categorias = relationship("CategoryBooks", back_populates="libro")
