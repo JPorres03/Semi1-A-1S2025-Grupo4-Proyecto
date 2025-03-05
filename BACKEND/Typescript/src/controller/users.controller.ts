@@ -26,15 +26,14 @@ export const getAuthenticatedUser = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { nombres, apellidos,password,email,fecha_nacimiento,rol } = req.body;
+        const { nombres, apellidos,email,fecha_nacimiento,rol } = req.body;
 
-        const hashedPassword = await bcrypt.hash(password, 10);
         const resultado = await pool.query(
             `UPDATE Usuarios 
-             SET Nombres = $1, Password_hash = $2, Apellidos = $3,Email = $4, Fecha_nacimiento = $5, Rol =$6
-             WHERE uuid = $7 
+             SET Nombres = $1, Apellidos = $2,Email = $3, Fecha_nacimiento = $4, Rol =$5
+             WHERE id = $6
              RETURNING *`,
-            [nombres, hashedPassword, apellidos,email,fecha_nacimiento,rol,id]
+            [nombres, apellidos,email,fecha_nacimiento,rol,id]
         );
         if (!resultado.rows[0]) {
             res.status(404).json({ message: 'User not found' });
