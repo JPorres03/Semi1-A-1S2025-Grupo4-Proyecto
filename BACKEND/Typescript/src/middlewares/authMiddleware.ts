@@ -1,38 +1,80 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
+import { ISessionToken } from "../interfaces/SessionToken";
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET || "";
+const JWT_KEY="FEU8IOH3FUHE3F9E4HF893489U84RJ304R34RI"
+export const generateJWT = (payload: ISessionToken) => {
 
+    const key = JWT_KEY
 
-export const generarToken = (userId: string) => {
-    const payload = { userId };
+    if(key){
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET as string, {
-      expiresIn: '1h',  // El token expira en 1 hora
-    });
-  
-    return token;
+        return new Promise((resolve, reject ) => {
+
+            jwt.sign(payload, key, {
+                expiresIn: '12h'
+            }, (error, token) => {
+    
+                if(error){
+                    console.log({
+                        message: 'Problems generating JWT',
+                        error
+                    })
+                    
+                    reject('Problems generating JWT')
+
+                }else{
+
+                    resolve(token)
+                }
+    
+            })
+        })
+
+    }
+
 }
 
 
 
-export const verificarToken = (req: Request, res: Response, next: NextFunction): void=> {
-    // Obtener el token de la cabecera Authorization
-    const token = req.header("Authorization") || "";
+export const validateToken = (req: Request, res: Response, next: NextFunction) => {
 
-    if (!token || token === "") {
-        res.status(401).json({ mensaje: "Acceso denegado. No hay token." });
+    const key = JWT_KEY
+
+    if(key){
+
+        try {
+
+            const token = req.header('Authorization')?.split(' ')[1]
+    
+            if(!token){
+
+                res.status(401).json({
+                    ok: false,
+                    message: 'Token is required in request'
+                })
+                return 
+                
+            }
+
+            req.body.token = jwt.verify(token, key) as ISessionToken
+
+            next()
+    
+        } catch (error) {
+
+             res.status(401).json({
+                ok: false,
+                message: 'Invalid token',
+                error
+            })
+            return
+            
+        }
+
     }
 
-    try {
-        // Verificar el token
-        const tokenVerificado = jwt.verify(token.split(" ")[1], JWT_SECRET) as JwtPayload;
-        req.body.usuario = tokenVerificado; // Guardar los datos del usuario en req.usuario
-        next(); // Continuar con la siguiente función (controlador o middleware)
-    } catch (error) {
-         res.status(403).json({ mensaje: "Token inválido." });
-    }
-};
+}

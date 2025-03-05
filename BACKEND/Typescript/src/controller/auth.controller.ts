@@ -1,12 +1,16 @@
 import { Request, Response } from 'express';
 import { pool } from "../config/database/Postgres";
 import bcrypt from "bcrypt";
-import { generarToken } from '../middlewares/authMiddleware';
+import { generateJWT } from '../middlewares/authMiddleware';
+import dotenv from 'dotenv';
+import {ISessionToken} from '../interfaces/SessionToken';
+
+const JWT_KEY = "FEU8IOH3FUHE3F9E4HF893489U84RJ304R34RI";
 
 
 export const register = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { nombre, apellido, password, email } = req.body;
+        const { nombre, apellido, password, email} = req.body;
 
         // Validación de los datos requeridos
         if (!nombre || !email || !password) {
@@ -24,6 +28,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
             res.status(400).json({ mensaje: "El usuario ya está registrado, Prueba con otro email!" });
             return
         }
+        
         const hashedPassword = await bcrypt.hash(password, 10);
         const date = new Date();
         const nuevoUsuario = await pool.query(
@@ -67,7 +72,12 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             return
         }
 
-        const token = generarToken(usuario.rows[0].Id_usuario);
+        const payload: ISessionToken = {
+            sub: usuario.rows[0].email,
+            uuid: usuario.rows[0].id_usuario,
+            role: usuario.rows[0].rol
+        }
+        const token = await generateJWT(payload);
         res.json({ mensaje: "Login exitoso", token, usuario: usuario.rows[0].nombres });
         return
     } catch (error: any) {

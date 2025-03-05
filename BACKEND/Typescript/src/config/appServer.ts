@@ -3,8 +3,8 @@ import express from 'express';
 import cors from 'cors'
 import { connectPg } from './database/Postgres';
 import auth from '../routes/auth.routes';
-
-
+import users from '../routes/users.routes';
+import books from '../routes/books.routes';
 const PORT =  3001;
 const app = express();
 
@@ -21,6 +21,8 @@ connectPg();
 app.use(express.json());
 
 app.use('/auth', auth);
+app.use('/users', users);
+app.use('/books', books);
 
 
 
