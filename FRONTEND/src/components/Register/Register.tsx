@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 function Register() {
     const [nombres, setNombres] = useState<string>('');
     const [apellidos, setApellidos] = useState<string>('');
-    const [fotoPerfil, setFotoPerfil] = useState<string | null>(null); // Cambiado a string para almacenar la URL base64
+    const [fotoPerfil, setFotoPerfil] = useState<File | null>(null); // Cambiado a File para almacenar la imagen
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -15,12 +15,7 @@ function Register() {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files ? e.target.files[0] : null;
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setFotoPerfil(reader.result as string); // Guardar la URL base64
-            };
-            reader.readAsDataURL(file); // Convertir el archivo a base64
-            console.log(file);
+            setFotoPerfil(file); // Guardar el archivo de imagen
         }
     };
 
@@ -28,7 +23,7 @@ function Register() {
         e.preventDefault();
 
         // Validaciones básicas
-        if (!nombres || !apellidos || !email || !password || !confirmPassword || !fechaNacimiento) {
+        if (!nombres || !apellidos || !email || !password || !confirmPassword || !fechaNacimiento || !fotoPerfil) {
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
@@ -46,23 +41,21 @@ function Register() {
             return;
         }
 
-        // Crear un objeto con los datos del formulario
-        const userData = {
-            nombres,
-            apellidos,
-            email,
-            password,
-            fechaNacimiento,
-            fotoPerfil, // Enviar la URL base64 de la imagen
-        };
+        // Crear un FormData para enviar los datos del formulario
+        const formData = new FormData();
+        formData.append('nombres', nombres);
+        formData.append('apellidos', apellidos);
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('fechaNacimiento', fechaNacimiento);
+        if (fotoPerfil) {
+            formData.append('fotoPerfil', fotoPerfil); // Agregar la imagen como archivo
+        }
 
         try {
             const response = await fetch('http://localhost:3001/auth/register', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(userData),
+                body: formData, // Enviar el FormData directamente
             });
 
             const data = await response.json();
@@ -127,7 +120,8 @@ function Register() {
                         id="fotoPerfil"
                         className='form-control'
                         accept="image/*"
-                        onChange={handleFileChange} // Usar la nueva función para manejar el archivo
+                        onChange={handleFileChange} // Manejar el cambio de archivo
+                        required
                     /><br />
 
                     <input

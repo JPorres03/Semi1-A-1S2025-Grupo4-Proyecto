@@ -31,8 +31,8 @@ function UpdateBook({ data }: BooksProps) {
   const [sinopsis, setSinopsis] = useState<string>(book?.Sinopsis || "");
   const [autor, setAutor] = useState<string>(book?.Autor || "");
   const [año, setAño] = useState<number>(book?.Año || 0);
-  const [nuevaImagen, setNuevaImagen] = useState<string | null>(null); // Para la nueva imagen en base64
-  const [nuevoPDF, setNuevoPDF] = useState<File | null>(null); // Para el nuevo PDF
+  const [nuevaImagen, setNuevaImagen] = useState<File | null>(null);
+  const [nuevoPDF, setNuevoPDF] = useState<File | null>(null);
 
   // Si no se encuentra el libro, mostrar un mensaje
   if (!book) {
@@ -43,12 +43,8 @@ function UpdateBook({ data }: BooksProps) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files ? e.target.files[0] : null;
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNuevaImagen(reader.result as string); // Guardar la URL base64
-        setPortada(reader.result as string); // Actualizar la vista previa de la imagen
-      };
-      reader.readAsDataURL(file); // Convertir el archivo a base64
+      setNuevaImagen(file);
+      setPortada(URL.createObjectURL(file)); // Actualizar la vista previa
     }
   };
 
@@ -63,6 +59,7 @@ function UpdateBook({ data }: BooksProps) {
   // Función para manejar la actualización del libro
   const handleUpdate = async () => {
     try {
+      
       const formData = new FormData();
       formData.append("Nombre", nombre);
       formData.append("Sinopsis", sinopsis);
@@ -110,15 +107,11 @@ function UpdateBook({ data }: BooksProps) {
 
   return (
     <div className="container-fluid details">
-        <div className="display-1 text-light my-4">ACTUALIZAR</div>
+      <div className="display-1 text-light my-4">ACTUALIZAR</div>
       <div className="row details-content px-5 py-5">
         <div className="col-md-4">
           {/* Imagen de la portada */}
-          <img
-            src={portada}
-            alt={nombre}
-            className="img-fluid"
-          />
+          <img src={portada} alt={nombre} className="img-fluid" />
           {/* Campo para actualizar la imagen */}
           <input
             type="file"
