@@ -8,7 +8,7 @@ export const getAuthenticatedUser = async (req: Request, res: Response) => {
         const { id } = req.params;
 
         const usuario = await pool.query(
-            `SELECT * FROM Usuarios WHERE uuid = $1`,
+            `SELECT * FROM usuarios WHERE id = $1`,
             [id]
         );
         if (!usuario.rows[0]) {
