@@ -1,11 +1,7 @@
 import { Request, Response } from 'express';
 import { pool } from "../config/database/Postgres";
 import bcrypt from "bcrypt";
-import { generateJWT } from '../middlewares/authMiddleware';
-import dotenv from 'dotenv';
-import {ISessionToken} from '../interfaces/SessionToken';
 
-const JWT_KEY = "FEU8IOH3FUHE3F9E4HF893489U84RJ304R34RI";
 
 
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -71,14 +67,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             res.status(401).json({ mensaje: "Contraseña incorrecta",error:true });
             return
         }
-
-        const payload: ISessionToken = {
-            sub: usuario.rows[0].email,
-            uuid: usuario.rows[0].id_usuario,
-            role: usuario.rows[0].rol
-        }
-        const token = await generateJWT(payload);
-        res.json({ mensaje: "Login exitoso", token, usuario: usuario.rows[0].nombres });
+        res.json({ mensaje: "Login exitoso", usuario: usuario.rows[0].nombres });
         return
     } catch (error: any) {
         res.status(500).json({ message: 'Error interno del servidor', error: error.message });

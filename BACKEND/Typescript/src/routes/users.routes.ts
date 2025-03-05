@@ -6,10 +6,10 @@ const router = Router();
 
 
 //endpoints to users routes
-router.get('/profile', validateToken, getAuthenticatedUser);
+router.get('/profile:id', validateToken, getAuthenticatedUser);
 
 
-router.put('/profile', validateToken, updateUser);
+router.put('/profile:id', validateToken, updateUser);
 
 
 router.get('/books/:id', validateToken, listUserBooks);
