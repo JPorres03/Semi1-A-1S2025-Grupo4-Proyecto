@@ -9,9 +9,9 @@ const router = Router();
 router.get('/profile/:id', getAuthenticatedUser);
 
 
-router.put('/profile/:id', validateToken, updateUser);
+router.put('/profile/:id', updateUser);
 
 
-router.get('/books/:id', validateToken, listUserBooks);
+router.get('/books/:id', listUserBooks);
 
 export default router;

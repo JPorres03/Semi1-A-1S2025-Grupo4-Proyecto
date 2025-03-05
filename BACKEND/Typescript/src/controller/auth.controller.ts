@@ -6,10 +6,10 @@ import bcrypt from "bcrypt";
 
 export const register = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { nombre, apellido, password, email} = req.body;
+        const { nombres, apellidos, password, email,Fecha_nacimiento,rol} = req.body;
 
         // Validación de los datos requeridos
-        if (!nombre || !email || !password) {
+        if (!nombres || !email || !password || !apellidos ||!Fecha_nacimiento ||!rol) {
             res.status(400).json({ message: 'Faltan datos requeridos (nombre, email, password)' });
             return
         }
@@ -29,7 +29,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         const date = new Date();
         const nuevoUsuario = await pool.query(
             `INSERT INTO Usuarios (Nombres,Apellidos,Email,Password_hash,Foto_perfil_url,Fecha_nacimiento,Rol) VALUES ($1, $2, $3,$4, $5, $6,$7) RETURNING *`,
-            [nombre, apellido, email, hashedPassword, , date, "usuario"]
+            [nombres, apellidos, email, hashedPassword, '' , Fecha_nacimiento, rol]
         );
 
         res.status(201).json({

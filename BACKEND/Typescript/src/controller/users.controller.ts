@@ -26,13 +26,15 @@ export const getAuthenticatedUser = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { nuevoNombre, nuevaContraseña } = req.body;
+        const { nombres, apellidos,password,email,fecha_nacimiento,rol } = req.body;
+
+        const hashedPassword = await bcrypt.hash(password, 10);
         const resultado = await pool.query(
             `UPDATE Usuarios 
-             SET nombre = $1, contraseña = $2 
-             WHERE uuid = $3 
+             SET Nombres = $1, Password_hash = $2, Apellidos = $3,Email = $4, Fecha_nacimiento = $5, Rol =$6
+             WHERE uuid = $7 
              RETURNING *`,
-            [nuevoNombre, nuevaContraseña, id]
+            [nombres, hashedPassword, apellidos,email,fecha_nacimiento,rol,id]
         );
         if (!resultado.rows[0]) {
             res.status(404).json({ message: 'User not found' });
@@ -51,6 +53,16 @@ export const updateUser = async (req: Request, res: Response) => {
 export const listUserBooks = async (req: Request, res: Response) => {
     try {
         const { id } = req.params
+        const usuario = await pool.query(
+            `SELECT * FROM libros WHERE usuario_id = $1`,
+            [id]
+        );
+        if (!usuario.rows[0]) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+        res.status(200).json(usuario.rows);
+        return;
     } catch (error: any) {
         res.status(500).json({ message: 'Internal server error', error: error.message });
         return;
