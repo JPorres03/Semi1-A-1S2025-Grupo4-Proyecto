@@ -1,13 +1,14 @@
-import { Pool } from "pg";
+import pkg from 'pg';
+const { Pool } = pkg;
 
 export const pool = new Pool({
   user: "postgres",
   host: "localhost",
-  database: "ebookvaultSS1",
-  password: "12345",
+  database: "SEMINARIO",
+  password: "admin",
   port: 5432, 
-  // ssl: { rejectUnauthorized: false }
 });
+
 
 export const connectPg= async() =>{
   try {
