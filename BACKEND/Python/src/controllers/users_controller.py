@@ -59,7 +59,7 @@ def user_books_controller(_id):
                 "sinopsis": adquisicion.libro.sinopsis,
                 "portada_url": adquisicion.libro.portada_url,
                 "pdf_url": adquisicion.libro.pdf_url,
-                "publicacion": adquisicion.libro.anio_publicacion.isoformat()
+                "publicacion": adquisicion.libro.anio_publicacion
             }
             for adquisicion in user.adquisiciones
         ]

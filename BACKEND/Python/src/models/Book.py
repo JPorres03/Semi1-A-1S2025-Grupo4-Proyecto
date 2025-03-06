@@ -10,7 +10,7 @@ class Book(db.Model):
     sinopsis = db.Column(db.String)
     portada_url = db.Column(db.String)
     pdf_url = db.Column(db.String)
-    anio_publicacion = db.Column(db.Date)
+    anio_publicacion = db.Column(db.Integer)
     
     # Relaciones
     adquisiciones = relationship("Adquisicion", back_populates="libro")
