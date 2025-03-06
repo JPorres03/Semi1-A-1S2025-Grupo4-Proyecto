@@ -24,6 +24,15 @@ connectPg();
 
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.status(200).json({ status: 'OK' });
+});
+
+app.get('/version', (req, res) => {
+  res.status(200).json({ version: '1.0.0' });
+});
+
+
 app.use('/auth', auth);
 app.use('/users', users);
 app.use('/books', books);

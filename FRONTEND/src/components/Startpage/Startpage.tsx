@@ -16,6 +16,7 @@ interface Book {
   Año: number;
   PDF: string;
   Estado: boolean;
+  categoria: string[];
 }
 
 function Startpage({ data }: { data: Book[] }) {

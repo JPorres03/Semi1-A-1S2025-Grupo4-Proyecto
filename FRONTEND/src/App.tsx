@@ -18,7 +18,7 @@ function App() {
     // Función para obtener los datos del backend
     const fetchData = async () => {
       try {
-        const response = await fetch('https://localhost:3001/api/books'); // Cambia la URL por la de tu backend
+        const response = await fetch('http://localhost:3001/books/');
         if (!response.ok) {
           throw new Error('Error al obtener los datos');
         }
