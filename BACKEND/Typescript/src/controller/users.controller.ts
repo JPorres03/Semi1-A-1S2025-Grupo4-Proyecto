@@ -39,7 +39,7 @@ export const updateUser = async (req: Request, res: Response) => {
             res.status(404).json({ message: 'User not found' });
             return;
         }
-        res.status(200).json({ message: 'User updated successfully', user: resultado.rows[0] });
+        res.status(200).json({ message: 'Usuario actualizado con éxito' });
 
         return;
     }

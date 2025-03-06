@@ -93,7 +93,7 @@ export const adquireBook = async(req: Request, res: Response) => {
 export const updateBook = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { titulo, autor, genero, descripcion } = req.body;
+        const { nombre, autor, genero, descripcion } = req.body;
 
         const result = await pool.query(
             `SELECT rol FROM Usuarios WHERE id = $1`,
@@ -109,10 +109,10 @@ export const updateBook = async (req: Request, res: Response) => {
 
         const resultado = await pool.query(
             `UPDATE Libros 
-             SET titulo = $1, autor = $2, genero = $3, descripcion = $4
+             SET nombre = $1, autor = $2, genero = $3, descripcion = $4
              WHERE id = $5
              RETURNING *`,
-            [titulo, autor, genero, descripcion, id]
+            [nombre, autor, genero, descripcion, id]
         );
         
         if (!resultado.rows[0]) {
@@ -166,7 +166,40 @@ export const createbook = async (req: Request, res: Response) => {
             res.status(404).json({ message: 'Error al crear el libro' });
             return;
         }
-        res.status(200).json(create.rows[0]);
+        res.status(200).json({nombre: create.rows[0].nombre,book_id: create.rows[0].id});
+        return;
+    }catch(error: any){
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+        return;
+    }
+};
+
+export const deleteBook = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { book_id } = req.body;
+
+        const verifyAdmin = await pool.query(
+            `SELECT rol FROM Usuarios WHERE id = $1`,
+            [id]
+        );
+        
+        const rolUser = verifyAdmin.rows[0]?.rol;
+        
+        if (rolUser !== 'admin') {
+            res.status(403).json({ message: 'Access denied, No eres un admin!' });
+            return;
+        }
+
+        const result = await pool.query(
+            `DELETE FROM libros WHERE id = $1 RETURNING *`,
+            [book_id]
+        );
+        if (!result.rows[0]) {
+            res.status(404).json({ message: 'Book not found' });
+            return;
+        }
+        res.status(200).json({ message: 'Book deleted successfully' });
         return;
     }catch(error: any){
         res.status(500).json({ message: 'Internal server error', error: error.message });
