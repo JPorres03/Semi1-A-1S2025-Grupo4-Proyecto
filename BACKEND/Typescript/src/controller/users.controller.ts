@@ -52,15 +52,15 @@ export const updateUser = async (req: Request, res: Response) => {
 export const listUserBooks = async (req: Request, res: Response) => {
     try {
         const { id } = req.params
-        const usuario = await pool.query(
-            `SELECT * FROM libros WHERE usuario_id = $1`,
+        const adquisiciones = await pool.query(
+            `SELECT * FROM adquisiciones WHERE usuario_id = $1`,
             [id]
         );
-        if (!usuario.rows[0]) {
-            res.status(404).json({ message: 'User not found' });
+        if (!adquisiciones.rows[0]) {
+            res.status(404).json({ message: 'El usuario no ha aquirido ningun libro!' });
             return;
         }
-        res.status(200).json(usuario.rows);
+        res.status(200).json(adquisiciones.rows);
         return;
     } catch (error: any) {
         res.status(500).json({ message: 'Internal server error', error: error.message });

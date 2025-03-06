@@ -4,7 +4,7 @@ export const pool = new Pool({
   user: "postgres",
   host: "localhost",
   database: "ebookvaultSS1",
-  password: "202106003",
+  password: "12345",
   port: 5432, 
   // ssl: { rejectUnauthorized: false }
 });
