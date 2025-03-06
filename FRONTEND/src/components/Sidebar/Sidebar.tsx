@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onSidebarClick }) => {
           </button>
         </li>
         {/* Mostrar la opción "Administrar" solo si el usuario es un administrador */}
-        {isAdmin && (
+        {!isAdmin && (
           <li>
             <button className="text-center fs-6" onClick={() => onSidebarClick('manage')}>
               Administrar

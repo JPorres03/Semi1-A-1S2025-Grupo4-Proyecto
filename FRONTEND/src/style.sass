@@ -141,9 +141,10 @@
 /* -------------------------------------------------------------------------- */
 .books-container 
     display: flex
+    flex-direction: column
     height: 90vh // Altura del contenedor principal
     width: 100% // Ancho del contenedor principal
-    background-color: #295b6c
+    background-color: #295b6c    
 
 .books
     flex: 1 // Ocupa el espacio restante
@@ -156,6 +157,13 @@
         display: flex
         flex-direction: column
         background-color: #ffffff
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5)
+        height: 500px
+        width: 300px
+
+        img
+            width: auto
+            height: 300px
 
 .loader
     width: 100vw

@@ -1,18 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import img from '../../../assets/profile.png';
 import { CiEdit } from "react-icons/ci";
 
 function Profile() {
-    const userId = sessionStorage.getItem("user"); // Obtener el ID del usuario desde sessionStorage
+    const user = sessionStorage.getItem("user"); // Obtener el ID del usuario desde sessionStorage
+    const userId = user ? JSON.parse(user).id : null;
 
-    const [nombres, setNombres] = useState<string>("Nombres y apellidos");
-    const [correo, setCorreo] = useState<string>("correo@example.com");
+    // Estados para los datos del perfil
+    const [nombres, setNombres] = useState<string>("Name");
+    const [apellidos, setApellidos] = useState<string>("Lastname");
+    const [correo, setCorreo] = useState<string>("example@example.com");
+    const [fechaNacimiento, setFechaNacimiento] = useState<string>("unknown");
     const [fotoPerfil, setFotoPerfil] = useState<string>(img);
     const [nuevaImagen, setNuevaImagen] = useState<File | null>(null);
     const [editFoto, setEditFoto] = useState<boolean>(false);
     const [editNombres, setEditNombres] = useState<boolean>(false);
     const [editCorreo, setEditCorreo] = useState<boolean>(false);
+
+    // Obtener los datos del perfil al montar el componente
+    useEffect(() => {
+        const fetchProfile = async () => {
+            if (!userId) return;
+
+            try {
+                const response = await fetch(`http://localhost:3001/users/profile/${userId}`);
+                if (!response.ok) {
+                    throw new Error("Error al obtener los datos del perfil");
+                }
+
+                const data = await response.json();
+                setNombres(data.nombres);
+                setApellidos(data.apellidos);
+                setCorreo(data.email);
+                setFechaNacimiento(data.fecha_nacimiento);
+                // Si el servidor devuelve una URL de la imagen de perfil, puedes usarla aquí:
+                // setFotoPerfil(data.fotoPerfil || img);
+            } catch (error) {
+                console.error("Error:", error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Hubo un problema al obtener los datos del perfil.",
+                });
+            }
+        };
+
+        fetchProfile();
+    }, [userId]); // Dependencia: userId
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files ? e.target.files[0] : null;
@@ -35,8 +70,8 @@ function Profile() {
         try {
             const formData = new FormData();
             formData.append("image", nuevaImagen);
-            
-            const response = await fetch(`https://tu-backend.com/api/profile/${userId}`, {
+
+            const response = await fetch(`http://localhost:3001/users/profile/${userId}/image`, {
                 method: "PUT",
                 body: formData,
             });
@@ -44,6 +79,9 @@ function Profile() {
             if (!response.ok) {
                 throw new Error("Error al actualizar la imagen de perfil");
             }
+
+            const data = await response.json();
+            setFotoPerfil(data.fotoPerfil); // Actualizar la URL de la imagen de perfil
 
             Swal.fire({
                 icon: "success",
@@ -71,12 +109,12 @@ function Profile() {
         }
 
         try {
-            const response = await fetch(`https://tu-backend.com/api/profile/${userId}`, {
+            const response = await fetch(`http://localhost:3001/users/profile/${userId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ field, value }),
+                body: JSON.stringify({ [field]: value }), // Enviar el campo y su valor
             });
 
             if (!response.ok) {
@@ -132,7 +170,7 @@ function Profile() {
                                 autoFocus
                             />
                         ) : (
-                            <>{nombres} <button className="btn btn-success" onClick={() => setEditNombres(true)}><CiEdit /></button></>
+                            <>{nombres} {apellidos} <button className="btn btn-success" onClick={() => setEditNombres(true)}><CiEdit /></button></>
                         )}
                     </h2>
                     <h3 className="py-2">
@@ -143,7 +181,7 @@ function Profile() {
                                 onChange={(e) => setCorreo(e.target.value)}
                                 onBlur={() => {
                                     setEditCorreo(false);
-                                    handleUpdate("correo", correo);
+                                    handleUpdate("email", correo);
                                 }}
                                 autoFocus
                             />
@@ -151,6 +189,7 @@ function Profile() {
                             <>{correo} <button className="btn btn-success" onClick={() => setEditCorreo(true)}><CiEdit /></button></>
                         )}
                     </h3>
+                    <h4 className="py-2">Fecha de nacimiento: {fechaNacimiento}</h4>
                     <h4 className="py-2">Libros adquiridos <strong className="fs-2 mx-3">3</strong></h4>
                 </div>
             </div>

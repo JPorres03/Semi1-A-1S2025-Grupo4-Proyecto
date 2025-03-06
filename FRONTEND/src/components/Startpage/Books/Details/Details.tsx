@@ -9,7 +9,8 @@ interface Book {
   Autor: string;
   Año: number;
   PDF: string;
-  Estado: boolean
+  Estado: boolean;
+  categoria: string[];
 }
 
 // Definimos las props del componente Books
@@ -28,7 +29,10 @@ function Details({ data }: BooksProps) {
 
   // Si no se encuentra el libro, mostrar un mensaje
   if (!book) {
-    return <div>Libro no encontrado</div>;
+    return <div>
+      <div className="fs-1 text-dark">Libro no encontrado</div>;
+      <button className="btn btn-warning me-2" onClick={() => { navigate(-1) }} >Regresar</button>
+    </div>
   }
   return (
     <div className="container-fluid details">
