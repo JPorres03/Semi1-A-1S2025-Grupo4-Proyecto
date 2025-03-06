@@ -9,7 +9,7 @@ def create_app():
     CORS(app)
     # Carga configuracion de db
     app.config.from_object(Config)
-
+    
     # Inicializar bases de datos
     init_databases(app)
 

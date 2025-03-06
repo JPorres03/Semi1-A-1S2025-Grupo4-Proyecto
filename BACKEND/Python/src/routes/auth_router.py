@@ -14,7 +14,3 @@ def login():
 @auth_blueprint.route('/register', methods=['POST'])
 def register():
     return register_controller()
-
-@auth_blueprint.route('/update/<int:_id>', methods=['PUT'])
-def update(_id):
-    return update_controller(_id, request.get_json())

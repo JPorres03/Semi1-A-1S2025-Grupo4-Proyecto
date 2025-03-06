@@ -19,7 +19,7 @@ def login_controller():
         usuario = User.query.filter_by(email=email).first()
 
         if usuario and usuario.check_password(password):
-            return jsonify(user = usuario.nombres, role = usuario.rol, email = usuario.email), 200
+            return jsonify(user_id = usuario.id, role = usuario.rol, email = usuario.email), 200
         else:
             return jsonify(mesagge = "Credenciales invalidas"), 401
     except Exception as e:
@@ -56,33 +56,7 @@ def register_controller():
         db.session.add(new_user)
         db.session.commit()
 
-        return jsonify(user = new_user.nombres, role = new_user.rol, email = new_user.email, naciemiento=new_user.fecha_nacimiento), 200
+        return jsonify(user_id = new_user.id, role = new_user.rol, email = new_user.email), 200
     except Exception as e:
         db.session.rollback()
         return jsonify(error = str(e)),500
-    
-def update_controller(_id, data):
-    try:
-        user = User.query.get(_id)
-        if not user:
-            return jsonify(error="Usuario no encontrado"), 404
-        
-        if 'nombres' in data:
-            user.nombres = data['nombres']
-        if 'apellidos' in data:
-            user.apellidos = data['apellidos']
-        if 'email' in data:
-            user.email = data['email']
-        if 'password' in data:
-            user.password = data['password']
-        if 'fecha_nacimiento' in data:
-            user.fecha_nacimiento = data['fecha_nacimiento']
-        if 'rol' in data:
-            user.rol = data['rol']
-        
-        db.session.commit()
-
-        return jsonify(message = "Usuario actualizado con exito"), 200
-    
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500

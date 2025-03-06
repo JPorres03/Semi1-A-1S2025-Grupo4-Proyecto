@@ -1,4 +1,4 @@
-from utils.db_connection import db
+from src.utils.db_connection import db
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
