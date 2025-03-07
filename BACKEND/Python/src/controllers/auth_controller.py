@@ -1,6 +1,10 @@
 from flask import jsonify, request
 from src.models.User import User
 from src.utils.db_connection import db
+from werkzeug.utils import secure_filename
+import boto3
+import os
+import uuid
 
 def test_connection_controller():
     try:
@@ -25,18 +29,42 @@ def login_controller():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-def register_controller():
+def register_controller(data):
     try:
-        data = request.get_json()
-        nombres = data.get('nombres')
-        apellidos = data.get('apellidos')
-        email= data.get('email')
-        password = data.get('password')
+        nombres = request.form.get('nombres')
+        apellidos = request.form.get('apellidos')
+        email= request.form.get('email')
+        password = request.form.get('password')
         # foto 
-        fecha_nacimeinto = data.get('fecha_nacimiento')
-        rol = data.get('rol')
+        fecha_nacimeinto = request.form.get('fecha_nacimiento')
+        rol = request.form.get('rol')
 
-        foto_perfil_url=""
+        foto_perfil=request.files.get('foto_perfil')
+
+        # nombre unico para la imagen
+        if foto_perfil:
+            filename = f"{uuid.uuid4()}_{secure_filename(foto_perfil.filename)}"
+        else:
+            return jsonify(error = "No se pudo cargar la foto del perfil"), 500
+
+        s3 = boto3.client(
+            's3',
+            region_name = os.getenv('AWS_REGION'),
+            aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+        )
+
+        if foto_perfil:
+            s3.upload_fileobj(
+                foto_perfil,
+                os.getenv('S3_BUCKET'),
+                f"Fotos/{filename}",
+                ExtraArgs={'ContentType': foto_perfil.content_type}
+            )
+            foto_url = f"https://{os.getenv('S3_BUCKET')}.s3.amazonaws.com/Fotos/{filename}"
+        else:
+            foto_url = None
+            return jsonify(error = "No se pudo cargar la foto del perfil"), 500
 
         user_correo = User.query.filter_by(email=email).first()
         if user_correo:
@@ -47,7 +75,7 @@ def register_controller():
             apellidos=apellidos,
             email=email,
             password_hash=password,
-            foto_perfil_url="",
+            foto_perfil_url=foto_url,
             fecha_nacimiento=fecha_nacimeinto,
             rol=rol
         )
@@ -56,7 +84,7 @@ def register_controller():
         db.session.add(new_user)
         db.session.commit()
 
-        return jsonify(user_id = new_user.id, role = new_user.rol, email = new_user.email), 200
+        return jsonify(user_id = new_user.id, role = new_user.rol, email = new_user.email, foto=foto_url), 200
     except Exception as e:
         db.session.rollback()
         return jsonify(error = str(e)),500

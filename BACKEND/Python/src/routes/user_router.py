@@ -14,3 +14,7 @@ def obtener_user(_id):
 @user_blueprint.route('/books/<int:_id>', methods=['GET'])
 def user_books(_id):
     return user_books_controller(_id)
+
+@user_blueprint.route('/profile/update_foto/<int:_id>', methods=['PUT'])
+def update_foto(_id):
+    return update_foto_controller(_id)

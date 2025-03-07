@@ -15,3 +15,11 @@ def update_book(_id):
 def delete_book(_id):
     return delete_book_controller(_id)
 
+@admin_blueprint.route('/books/update_portada/<ind:_id>', methods=['PUT'])
+def update_portada(_id):
+    return update_portada_controller(_id)
+
+@admin_blueprint.route('/books/update_pdf/<int:_id>', methods=['PUT'])
+def update_pdf(_id):
+    return update_pdf_controller(_id)
+

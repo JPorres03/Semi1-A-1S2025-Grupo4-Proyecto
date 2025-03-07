@@ -1,24 +1,23 @@
 from flask import jsonify, request
 from src.utils.db_connection import db
-from sqlalchemy.orm import joinedload
-from datetime import datetime
-from src.models.User import User
 from src.models.Book import Book
 from src.models.Category import Category
 from src.models.Adquisicion import Adquisicion
 from src.models.CategoryBooks import CategoryBooks
-
+from werkzeug.utils import secure_filename
+import boto3
+import os
+import uuid
 
 def create_book_controller():
     try:
-        data = request.get_json()
-        nombre = data.get('nombre')
-        autor = data.get('autor')
-        sinopsis = data.get('sinopsis')
-        portada_url = ""
-        pdf_url = " "
-        anio_publicacion = data.get('anio_publicacion')
-        categorias = list(map(int, data.get('categorias')))
+        nombre = request.form.get('nombre')
+        autor = request.form.get('autor')
+        sinopsis = request.form.get('sinopsis')
+        portada = request.files.get('portada')
+        pdf = request.files.get('pdf')
+        anio_publicacion = request.form.get('anio_publicacion')
+        categorias = request.form.getlist('categorias')
 
         book = Book.query.filter_by(nombre=nombre).first()
         if book:
@@ -32,13 +31,53 @@ def create_book_controller():
         if categorias_count != len(categorias) or len(categorias) < 1:
             return jsonify(error="Categorías inválidas o duplicadas"), 400
 
+        # carga de foto a S3
+        if portada:
+            filename = f"{uuid.uuid4()}_{secure_filename(portada.filename)}"
+        else:
+            filename = None
+
+        s3 = boto3.client(
+            's3',
+            region_name = os.getenv('AWS_REGION'),
+            aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+        )
+
+        if portada:
+            s3.upload_fileobj(
+                portada,
+                os.getenv('S3_BUCKET'),
+                f"Fotos/{filename}",
+                ExtraArgs={'ContentType': portada.content_type}
+            )
+            portada_url = f"https://{os.getenv('S3_BUCKET')}.s3.amazonaws.com/Fotos/{filename}"
+        else:
+            portada_url = None
+            return jsonify(error = "No se pudo cargar la portada del libro"), 500
+
+        # Carga del libro a S3
+        if pdf:
+            filename = f"{uuid.uuid4()}_{secure_filename(pdf.filename)}"
+
+            s3.upload_fileobj(
+                pdf,
+                os.getenv('S3_BUCKET'),
+                f"Libros/{filename}",
+                ExtraArgs={'ContentType':"application/pdf"}
+            )
+            pdf_url = f"https://{os.getenv('S3_BUCKET')}.s3.amazonaws.com/Libros/{filename}"
+        else:
+            pdf_url = None
+            return jsonify(error = "No se pudo cargar el pdf"), 500
+
 
         new_book = Book(
             nombre=nombre,
             autor=autor,
             sinopsis=sinopsis,
-            portada_url="http",
-            pdf_url="http",
+            portada_url=portada_url,
+            pdf_url=pdf_url,
             anio_publicacion=anio_publicacion
         )
 
@@ -87,8 +126,6 @@ def delete_book_controller(id):
         
         Adquisicion.query.filter_by(libro_id=id).delete()
         CategoryBooks.query.filter_by(libro_id=id).delete()
-
-        # pendiente eliminacion de la nube
 
         db.session.delete(book)
         db.session.commit()

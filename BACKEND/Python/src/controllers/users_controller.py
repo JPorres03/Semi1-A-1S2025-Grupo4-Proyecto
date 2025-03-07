@@ -3,6 +3,11 @@ from src.utils.db_connection import db
 from sqlalchemy.orm import joinedload
 from src.models.User import User
 from src.models.Adquisicion import Adquisicion
+from werkzeug.utils import secure_filename
+import boto3
+import os
+import uuid
+
 
 
 def update_controller(_id, data):
@@ -87,6 +92,42 @@ def get_user_controller(id):
             fecha_nacimiento = user.fecha_nacimiento,
             rol = user.rol
         ), 200
+
+    except Exception as e:
+        return jsonify(error = str(e)), 500
+    
+def update_foto_controller(id):
+    try:
+        user = User.query.get(id)
+        if not user:
+            return jsonify(error = "Usuario no encontrado"), 404
+        
+        new_photo = request.files.get('nueva_foto')
+        if new_photo:
+            filename = f"{uuid.uuid4()}_{secure_filename(new_photo.filename)}"
+
+            s3 = boto3.client(
+                's3',
+                region_name = os.getenv('AWS_REGION'),
+                aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID'),
+                aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+            )
+            s3.upload_fileobj(
+                new_photo,
+                os.getenv('S3_BUCKET'),
+                f"Fotos/{filename}",
+                ExtraArgs={'ContentType': new_photo.content_type}
+            )
+            foto_url = f"https://{os.getenv('S3_BUCKET')}.s3.amazonaws.com/Fotos/{filename}"
+        else:
+            return jsonify(error = "No se pudo actualizar foto perfil"), 501
+
+        user.foto_perfil_url = foto_url
+
+        db.session.commit()
+
+        return jsonify(message = "Actualizacion exitosa"), 200
+
 
     except Exception as e:
         return jsonify(error = str(e)), 500

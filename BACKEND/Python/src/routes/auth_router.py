@@ -13,4 +13,4 @@ def login():
 
 @auth_blueprint.route('/register', methods=['POST'])
 def register():
-    return register_controller()
+    return register_controller(request.ge)
