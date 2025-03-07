@@ -29,7 +29,7 @@ def login_controller():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-def register_controller(data):
+def register_controller():
     try:
         nombres = request.form.get('nombres')
         apellidos = request.form.get('apellidos')

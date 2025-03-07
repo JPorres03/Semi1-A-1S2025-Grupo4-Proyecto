@@ -8,6 +8,32 @@ from src.models.Category import Category
 from src.models.Adquisicion import Adquisicion
 from src.models.CategoryBooks import CategoryBooks
 
+def new_categorie_controller():
+    try:
+        data = request.get_json()
+
+        nombre = data.get('nombre')
+        if not nombre:
+            return jsonify(error="El campo 'nombre' es requerido"), 400
+
+        # Validar si la categoría ya existe
+        existing_category = Category.query.filter_by(nombre=nombre).first()
+        if existing_category:
+            return jsonify(error="Ya existe una categoría con este nombre"), 409
+        
+        new_category = Category(nombre=nombre)
+        db.session.add(new_category)
+        db.session.commit()
+
+        return jsonify(
+            id=new_category.id,
+            nombre=new_category.nombre
+        ), 201
+        
+
+    except Exception as e:
+        return jsonify(error = str(e))
+
 def categories_controller():
     try:
         categories = Category.query.all()

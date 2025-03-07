@@ -10,3 +10,7 @@ def categories():
 @categorie_blueprint.route('/<int:_id>/books', methods=['GET'])
 def categories_book(_id):
     return categories_book_controller(_id)
+
+@categorie_blueprint.route('/create', methods=['POST'])
+def new_categorie():
+    return new_categorie_controller()

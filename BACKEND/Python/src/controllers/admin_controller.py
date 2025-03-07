@@ -135,3 +135,75 @@ def delete_book_controller(id):
     except Exception as e:
         db.session.rollback()
         return jsonify(error = str(e)), 500
+    
+def update_portada_controller(id):
+    try:
+        book = Book.query.get(id)
+        if not book:
+            return jsonify(error = "libro no encontrado"), 404
+        
+        new_photo = request.files.get('nueva_foto')
+        if new_photo:
+            filename = f"{uuid.uuid4()}_{secure_filename(new_photo.filename)}"
+
+            s3 = boto3.client(
+                's3',
+                region_name = os.getenv('AWS_REGION'),
+                aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID'),
+                aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+            )
+            s3.upload_fileobj(
+                new_photo,
+                os.getenv('S3_BUCKET'),
+                f"Fotos/{filename}",
+                ExtraArgs={'ContentType': new_photo.content_type}
+            )
+            foto_url = f"https://{os.getenv('S3_BUCKET')}.s3.amazonaws.com/Fotos/{filename}"
+        else:
+            return jsonify(error = "No se pudo actualizar foto perfil"), 501
+
+        book.portada_url = foto_url
+
+        db.session.commit()
+
+        return jsonify(message = "Actualizacion exitosa"), 200
+
+
+    except Exception as e:
+        return jsonify(error = str(e)), 500
+
+def update_pdf_controller(id):
+    try:
+        book = Book.query.get(id)
+        if not book:
+            return jsonify(error = "libro no encontrado"), 404
+        
+        nuevo_pdf = request.files.get('nuevo_pdf')
+        if nuevo_pdf:
+            filename = f"{uuid.uuid4()}_{secure_filename(nuevo_pdf.filename)}"
+
+            s3 = boto3.client(
+                's3',
+                region_name = os.getenv('AWS_REGION'),
+                aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID'),
+                aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+            )
+            s3.upload_fileobj(
+                nuevo_pdf,
+                os.getenv('S3_BUCKET'),
+                f"Fotos/{filename}",
+                ExtraArgs={'ContentType': 'application/pdf'}
+            )
+            pdf_url = f"https://{os.getenv('S3_BUCKET')}.s3.amazonaws.com/Libros/{filename}"
+        else:
+            return jsonify(error = "No se pudo actualizar foto perfil"), 501
+
+        book.pdf_url = pdf_url
+
+        db.session.commit()
+
+        return jsonify(message = "Actualizacion exitosa"), 200
+
+
+    except Exception as e:
+        return jsonify(error = str(e)), 500
