@@ -3,6 +3,14 @@ import { Request, Response } from 'express';
 import { pool } from "../config/database/Postgres";
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
+import { configDotenv } from 'dotenv';
+import multer from 'multer';
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+
+configDotenv();
 
 export const getAuthenticatedUser = async (req: Request, res: Response) => {
     try {
@@ -105,11 +113,14 @@ export const listUserBooks = async (req: Request, res: Response) => {
     }
 };
 
+
 export const updateProfilePhoto = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const {files} = req.body;
+        const { extra_data } = req.body; // Acceder a otros valores enviados en el body
+        const file = req.file;
 
+        
         const userResult = await pool.query(
             'SELECT id FROM usuarios WHERE id = $1',
             [id]
@@ -120,15 +131,13 @@ export const updateProfilePhoto = async (req: Request, res: Response) => {
             return;
         }
 
-        if (!files || !files.nueva_foto) {
+        if (!file) {
             res.status(400).json({ message: 'No file uploaded' });
             return;
         }
 
-        const photo = files.nueva_foto;
-        const filename = `${uuidv4()}_${photo.name}`;
+        const filename = `${uuidv4()}_${file.originalname}`;
 
-        // Configure S3 client
         const s3Client = new S3Client({
             region: process.env.AWS_REGION,
             credentials: {
@@ -137,20 +146,18 @@ export const updateProfilePhoto = async (req: Request, res: Response) => {
             }
         });
 
-        // Upload to S3
         await s3Client.send(new PutObjectCommand({
             Bucket: process.env.S3_BUCKET!,
             Key: `Fotos/${filename}`,
-            Body: photo.data,
-            ContentType: photo.mimetype
+            Body: file.buffer,
+            ContentType: file.mimetype
         }));
 
         const photoUrl = `https://${process.env.S3_BUCKET}.s3.amazonaws.com/Fotos/${filename}`;
 
-        // Update user's photo URL in database
         const updateResult = await pool.query(
             `UPDATE usuarios 
-             SET foto_perfil = $1 
+             SET foto_perfil_url = $1 
              WHERE id = $2 
              RETURNING *`,
             [photoUrl, id]
@@ -163,9 +170,10 @@ export const updateProfilePhoto = async (req: Request, res: Response) => {
 
         res.status(200).json({ 
             message: 'Profile photo updated successfully',
-            photo_url: photoUrl 
+            photo_url: photoUrl,
+            extra_data_received: extra_data // Devolver la clave-valor recibida
         });
-        
+
     } catch (error: any) {
         res.status(500).json({ 
             message: 'Internal server error', 
@@ -173,4 +181,6 @@ export const updateProfilePhoto = async (req: Request, res: Response) => {
         });
     }
 };
-//s
+
+// Middleware para manejar la subida del archivo
+export const uploadMiddleware = upload.single('nueva_foto');

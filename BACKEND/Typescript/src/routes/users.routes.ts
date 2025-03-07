@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAuthenticatedUser, updateUser, listUserBooks, updateProfilePhoto } from '../controller/users.controller';
+import { getAuthenticatedUser, updateUser, listUserBooks, updateProfilePhoto, uploadMiddleware } from '../controller/users.controller';
 
 const router = Router();
 
@@ -13,6 +13,6 @@ router.put('/profile/:id', updateUser);
 
 router.get('/books/:id', listUserBooks);
 
-router.put('/profile/update_foto/:id>', updateProfilePhoto);
+router.put('/profile/update_foto/:id',uploadMiddleware ,updateProfilePhoto);
 
 export default router;
