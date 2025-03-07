@@ -7,7 +7,12 @@ export const getBooks = async (req: Request, res: Response) => {
         const books = await pool.query(
             `SELECT * FROM Libros`
         );
-        res.status(200).json(books.rows);
+        res.status(200).json({
+                id: books.rows[0].id,
+                nombre: books.rows[0].nombre,
+                autor: books.rows[0].autor,
+                portada_url: books.rows[0].portada_url
+            });
         return;
     } catch (error: any) {
         res.status(500).json({ message: 'Internal server error', error: error.message });
@@ -16,7 +21,7 @@ export const getBooks = async (req: Request, res: Response) => {
 };
 
 
-export const searchBook = async(req: Request, res: Response) => {
+export const searchBook = async (req: Request, res: Response) => {
     try {
         const { nombre } = req.body;
         const books = await pool.query(
@@ -27,182 +32,94 @@ export const searchBook = async(req: Request, res: Response) => {
             res.status(404).json({ message: `No books found with the name ${nombre}` });
             return;
         }
-        res.status(200).json(books.rows);
+        res.status(200).json({
+            id: books.rows[0].id,
+            nombre: books.rows[0].nombre,
+            autor: books.rows[0].autor,
+            portada_url: books.rows[0].portada_url
+        });
         return;
-    }catch(error: any){
+    } catch (error: any) {
         res.status(500).json({ message: 'Internal server error', error: error.message });
         return;
     }
 };
 
-export const detailsBooks = async(req: Request, res: Response) => {
+export const detailsBooks = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const book = await pool.query(
-            `SELECT * FROM Libros WHERE id = $1`,
+        const bookQuery = await pool.query(
+            `SELECT id, nombre, autor, sinopsis, portada_url, pdf_url, anio_publicacion AS anio
+            FROM libros WHERE id = $1`,
             [id]
         );
-        if (!book.rows[0]) {
-            res.status(404).json({ message: `Book not found with id: ${id}` });
-            return;
+        if (bookQuery.rowCount === 0) {
+            res.status(404).json({ error: 'No se encontró ningún libro con ese id' });
+            return
         }
-        res.status(200).json(book.rows[0]);
+        const categoriaQuery = await pool.query(
+            `SELECT c.id, c.nombre 
+            FROM libros_categorias lc
+            JOIN categorias c ON lc.categoria_id = c.id
+            WHERE lc.libro_id = $1`,
+            [id]
+        );
+        res.status(200).json({
+            ...bookQuery.rows[0],
+            categoria: categoriaQuery.rows
+        });
         return;
-    }catch(error: any){
+    } catch (error: any) {
         res.status(500).json({ message: 'Internal server error', error: error.message });
         return;
 
     }
 }
-export const adquireBook = async(req: Request, res: Response) => {
-    try {
-        const { libro_id } = req.body;
-        const { id } = req.params;
-        console.log(libro_id, id);
-        if (!libro_id || !id) {
-            res.status(400).json({ message: 'Faltan datos requeridos (libro_id, usuario_id)' });
-            return;
-        }
-        //verificar si el usuario ya tiene ese libro
-        const adquirido = await pool.query(
-            `SELECT * FROM Adquisiciones WHERE usuario_id = $1 AND libro_id = $2`,
-            [id, libro_id]
-        );
-        if (adquirido.rows[0]) {
-            res.status(400).json({ message: `El usuario ya ha adquirido este libro!` });
-            return;
-        }
-        const adquisicion = await pool.query(
-            `INSERT INTO Adquisiciones (usuario_id, libro_id) VALUES ($1, $2) RETURNING *`,
-            [id, libro_id]
-        );
-        if (!adquisicion.rows[0]) {
-            res.status(404).json({ message: `Error al adquirir el libro` });
-            return;
-        }
-        res.status(200).json(adquisicion.rows[0]);
-        return;
-    }catch(error: any){
-        res.status(500).json({ message: 'Internal server error', error: error.message });
-        return;
-
-    }
-};
-
-//solo admin
-export const updateBook = async (req: Request, res: Response) => {
+export const adquireBook = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { nombre, autor, genero, descripcion } = req.body;
+        const { usuario_id } = req.body;
 
-        const result = await pool.query(
-            `SELECT rol FROM Usuarios WHERE id = $1`,
+        const userQuery = await pool.query(
+            `SELECT id FROM usuarios WHERE id = $1`,
+            [usuario_id]
+        );
+
+        if (userQuery.rowCount === 0) {
+            res.status(404).json({ error: 'Usuario no encontrado' });
+            return
+        }
+
+        const bookQuery = await pool.query(
+            `SELECT id FROM libros WHERE id = $1`,
             [id]
         );
-        
-        const rolUser = result.rows[0]?.rol;
-        
-        if (rolUser !== 'admin') {
-            res.status(403).json({ message: 'Access denied' });
-            return;
+
+        if (bookQuery.rowCount === 0) {
+            res.status(404).json({ error: 'Libro no encontrado' });
+            return
         }
 
-        const resultado = await pool.query(
-            `UPDATE Libros 
-             SET nombre = $1, autor = $2, genero = $3, descripcion = $4
-             WHERE id = $5
-             RETURNING *`,
-            [nombre, autor, genero, descripcion, id]
+        const adquisicionQuery:any = await pool.query(
+            `SELECT * FROM adquisiciones WHERE usuario_id = $1 AND libro_id = $2`,
+            [usuario_id, id]
         );
-        
-        if (!resultado.rows[0]) {
-            res.status(404).json({ message: 'Book not found' });
-            return;
+
+        if (adquisicionQuery.rowCount > 0) {
+            res.status(400).json({ error: 'El usuario ya adquirió este libro' });
+            return
         }
 
+        await pool.query(
+            `INSERT INTO adquisiciones (usuario_id, libro_id) VALUES ($1, $2)`,
+            [usuario_id, id]
+        );
 
-        res.status(200).json({ 
-            message: 'Book updated successfully', 
-            book: resultado.rows[0]
-        });
-
-    }catch(error: any){
-        res.status(500).json({ message: 'Internal server error', error: error.message });
+        res.status(200).json({ message: 'Adquisición realizada con éxito' });
         return;
+    } catch (error: any) {
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+        return
     }
 };
 
-export const createbook = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const { titulo, autor, sinopsis, portada_url,pdf_url,anio_publicacion } = req.body;
-        const verifyAdmin = await pool.query(
-            `SELECT rol FROM Usuarios WHERE id = $1`,
-            [id]
-        );
-        
-        const rolUser = verifyAdmin.rows[0]?.rol;
-        
-        if (rolUser !== 'admin') {
-            res.status(403).json({ message: 'Access denied, No eres un admin!' });
-            return;
-        }
-
-        //verificar si ya existe
-        const result = await pool.query(
-            `SELECT * FROM Libros WHERE nombre = $1`,
-            [titulo]
-        );
-
-        if (result.rows[0]) {
-            res.status(400).json({ message: 'El libro ya fue creado anteriormente' });
-            return;
-        }
-        const create = await pool.query(
-            `INSERT INTO Libros (nombre, autor, sinopsis, portada_url,pdf_url,anio_publicacion) VALUES ($1, $2, $3, $4,$5,$6) RETURNING *`,
-            [titulo, autor, sinopsis, portada_url,pdf_url,anio_publicacion]
-        );
-        if (!create.rows[0]) {
-            res.status(404).json({ message: 'Error al crear el libro' });
-            return;
-        }
-        res.status(200).json({nombre: create.rows[0].nombre,book_id: create.rows[0].id});
-        return;
-    }catch(error: any){
-        res.status(500).json({ message: 'Internal server error', error: error.message });
-        return;
-    }
-};
-
-export const deleteBook = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const { book_id } = req.body;
-
-        const verifyAdmin = await pool.query(
-            `SELECT rol FROM Usuarios WHERE id = $1`,
-            [id]
-        );
-        
-        const rolUser = verifyAdmin.rows[0]?.rol;
-        
-        if (rolUser !== 'admin') {
-            res.status(403).json({ message: 'Access denied, No eres un admin!' });
-            return;
-        }
-
-        const result = await pool.query(
-            `DELETE FROM libros WHERE id = $1 RETURNING *`,
-            [book_id]
-        );
-        if (!result.rows[0]) {
-            res.status(404).json({ message: 'Book not found' });
-            return;
-        }
-        res.status(200).json({ message: 'Book deleted successfully' });
-        return;
-    }catch(error: any){
-        res.status(500).json({ message: 'Internal server error', error: error.message });
-        return;
-    }
-};

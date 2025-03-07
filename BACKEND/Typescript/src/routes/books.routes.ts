@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { getBooks, searchBook,detailsBooks,updateBook, adquireBook ,createbook, deleteBook} from '../controller/books.controller';
-import { create } from 'domain';
+import { getBooks, searchBook,detailsBooks, adquireBook} from '../controller/books.controller';
+
 
 const router = Router();
 
@@ -8,11 +8,8 @@ const router = Router();
 router.get('/', getBooks);
 router.post('/search',searchBook);
 router.get('/:id', detailsBooks);
-router.post('/adquire/:id',adquireBook);
-//ADMIN
-router.put('/admin/:id', updateBook);
-router.post('/admin/create/:id', createbook);
-router.post('/admin/delete/:id', deleteBook);
+router.post('/:id/acquire',adquireBook);
+
 
 export default router;
 

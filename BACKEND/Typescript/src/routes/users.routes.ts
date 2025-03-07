@@ -1,7 +1,6 @@
 import { Router } from 'express';
-import jwt from 'jsonwebtoken';
 import { getAuthenticatedUser, updateUser, listUserBooks } from '../controller/users.controller';
-import { validateToken } from '../middlewares/authMiddleware';
+
 const router = Router();
 
 

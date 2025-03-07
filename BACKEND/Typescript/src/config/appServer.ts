@@ -7,6 +7,7 @@ import auth from '../routes/auth.routes';
 import users from '../routes/users.routes';
 import books from '../routes/books.routes';
 import categories from '../routes/categories.routes';
+import admin from '../routes/admin.routes';
 
 const PORT =  3001;
 const app = express();
@@ -37,6 +38,7 @@ app.use('/auth', auth);
 app.use('/users', users);
 app.use('/books', books);
 app.use('/categories', categories);
+app.use('/admin', admin);
 
 
 app.listen(PORT, () => {
