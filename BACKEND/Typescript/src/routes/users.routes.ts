@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAuthenticatedUser, updateUser, listUserBooks } from '../controller/users.controller';
+import { getAuthenticatedUser, updateUser, listUserBooks, updateProfilePhoto } from '../controller/users.controller';
 
 const router = Router();
 
@@ -12,5 +12,7 @@ router.put('/profile/:id', updateUser);
 
 
 router.get('/books/:id', listUserBooks);
+
+router.put('/profile/update_foto/:id>', updateProfilePhoto);
 
 export default router;
