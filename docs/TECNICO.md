@@ -3,6 +3,8 @@
 ## Objetivos
 ## Explicación de Arquitectura del proyecto.
 ## Diagrama Entidad Relación
+![alt text](./images/ER.png)
+
 ## Descripción de cada usuario de IAM creado con las políticas asociadas.
 
 ### Grupos de seguridad
