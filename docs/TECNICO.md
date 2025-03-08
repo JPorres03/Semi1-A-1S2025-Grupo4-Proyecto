@@ -51,4 +51,13 @@ Se cuenta con tres usuarios que comparten grupos de políticas:
 Se configuró un Load Balancer el cual tiene atada las dos intancias EC2 que se crearon para cada servicio estas, están unidas por el mismo puerto **3001**.
 ![loadbalancer](./images/load.png)
 
+### Configuracion de S3
+![alt text](images/image.png)
+![alt text](images/image2.png)
+![alt text](images/image3.png)
+![alt text](images/image4.png)
+![alt text](images/image5.png)
+![alt text](images/image6.png)
+![alt text](images/image7.png)
+![alt text](images/image8.png)
 ## Conclusiones
