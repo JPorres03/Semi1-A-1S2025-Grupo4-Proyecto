@@ -1,36 +1,74 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
+import { endpoint } from "../../../../main";
 
 interface Book {
   id: number;
-  Nombre: string;
-  Portada: string;
-  Sinopsis: string;
-  Autor: string;
-  Año: number;
-  PDF: string;
-  Estado: boolean;
+  nombre: string;
+  portada_url: string;
+  sinopsis: string;
+  autor: string;
+  anio: number;
+  estado: boolean;
+  pdf_url: string;
+  categoria: string[];
 }
 
-// Definimos las props del componente Books
-interface BooksProps {
-  data: Book[];
-}
+const user = sessionStorage.getItem("user"); // Obtener la cadena JSON
+const usuario = user ? JSON.parse(user) : null; // Parsear la cadena JSON a un objeto
 
-function UpdateBook({ data }: BooksProps) {
+function UpdateBook() {
   const navigate = useNavigate();
   const params = useParams();
+  const [book, setBook] = useState<Book | null>(null);
+
+  useEffect(() => {
+    // Verificar si el usuario está autenticado
+    const user = sessionStorage.getItem("user");
+    if (!user) {
+      navigate("/login");
+    }
+  }, []);
 
   // Buscar el libro correspondiente en la lista de libros
-  const book = data.find((book) => book.id === Number(params.id));
+  const book_id = Number(params.id);
+
+  // Obtener los datos del libro
+  useEffect(() => {
+    const fetchBook = async () => {
+      try {
+        const response = await fetch(`${endpoint}/books/${book_id}`);
+        if (!response.ok) {
+          throw new Error("Error al obtener los datos del libro");
+        }
+
+        const data = await response.json();
+
+        // Actualizar los estados con los datos recibidos
+        setBook(data);
+        setNombre(data.nombre);
+        setAutor(data.autor);
+        setSinopsis(data.sinopsis);
+        setAño(data.anio);
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Hubo un problema al obtener los datos del libro.",
+        }).then(() => {
+          navigate("/"); // Redirigir al inicio
+        });
+      }
+    };
+    fetchBook();
+  }, [book_id]);
 
   // Estados para los campos editables
-  const [nombre, setNombre] = useState<string>(book?.Nombre || "");
-  const [portada, setPortada] = useState<string>(book?.Portada || "");
-  const [sinopsis, setSinopsis] = useState<string>(book?.Sinopsis || "");
-  const [autor, setAutor] = useState<string>(book?.Autor || "");
-  const [año, setAño] = useState<number>(book?.Año || 0);
+  const [nombre, setNombre] = useState<string>("");
+  const [sinopsis, setSinopsis] = useState<string>("");
+  const [autor, setAutor] = useState<string>("");
+  const [año, setAño] = useState<number>(0);
   const [nuevaImagen, setNuevaImagen] = useState<File | null>(null);
   const [nuevoPDF, setNuevoPDF] = useState<File | null>(null);
 
@@ -44,7 +82,6 @@ function UpdateBook({ data }: BooksProps) {
     const file = e.target.files ? e.target.files[0] : null;
     if (file) {
       setNuevaImagen(file);
-      setPortada(URL.createObjectURL(file)); // Actualizar la vista previa
     }
   };
 
@@ -56,62 +93,145 @@ function UpdateBook({ data }: BooksProps) {
     }
   };
 
-  // Función para manejar la actualización del libro
-  const handleUpdate = async () => {
+  // Función para actualizar los campos básicos (nombre, autor, sinopsis, año)
+  const handleUpdateBook = async () => {
     try {
-      
-      const formData = new FormData();
-      formData.append("Nombre", nombre);
-      formData.append("Sinopsis", sinopsis);
-      formData.append("Autor", autor);
-      formData.append("Año", año.toString());
-      
-      // Agregar la nueva imagen si está presente
-      if (nuevaImagen) {
-        formData.append("Portada", nuevaImagen);
+      const updatedFields: any = {};
+
+      // Verificar si los campos han cambiado
+      if (nombre !== book.nombre) updatedFields.nombre = nombre;
+      if (autor !== book.autor) updatedFields.autor = autor;
+      if (sinopsis !== book.sinopsis) updatedFields.sinopsis = sinopsis;
+      if (año !== book.anio) updatedFields.anio_publicacion = año;
+
+      // Si no hay campos actualizados, no hacer la petición
+      if (Object.keys(updatedFields).length === 0) {
+        console.log("No hay campos para actualizar.");
+        return;
       }
 
-      // Agregar el nuevo PDF si está presente
-      if (nuevoPDF) {
-        formData.append("PDF", nuevoPDF);
-      }
-
-      // Realizar la petición de actualización
-      const response = await fetch(`https://tu-backend.com/api/books/${book.id}`, {
+      const response = await fetch(`${endpoint}/admin/books/${book.id}`, {
         method: "PUT",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedFields),
       });
 
       if (!response.ok) {
         throw new Error("Error al actualizar el libro");
       }
 
-      // Mostrar alerta de éxito
       Swal.fire({
         icon: "success",
         title: "¡Actualizado!",
-        text: "El libro se ha actualizado correctamente.",
-      }).then(() => {
-        navigate("/"); // Redirigir a la página principal
+        text: "Los datos del libro se han actualizado correctamente.",
       });
     } catch (error) {
       console.error("Error:", error);
-      // Mostrar alerta de error
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Hubo un problema al actualizar el libro.",
+        text: "Hubo un problema al actualizar los datos del libro.",
       });
     }
+  };
+
+  // Función para actualizar la portada
+  const handleUpdatePortada = async () => {
+    if (!nuevaImagen) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Por favor, selecciona una nueva imagen.",
+      });
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("nueva_foto", nuevaImagen);
+
+      const response = await fetch(`${endpoint}/admin/books/update_portada/${book.id}`, {
+        method: "PUT",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al actualizar la portada");
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "¡Actualizado!",
+        text: "La portada se ha actualizado correctamente.",
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Hubo un problema al actualizar la portada.",
+      });
+    }
+  };
+
+  // Función para actualizar el PDF
+  const handleUpdatePDF = async () => {
+    if (!nuevoPDF) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Por favor, selecciona un nuevo PDF.",
+      });
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("nuevo_pdf", nuevoPDF);
+
+      const response = await fetch(`${endpoint}/admin/books/update_pdf/${book.id}`, {
+        method: "PUT",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al actualizar el PDF");
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "¡Actualizado!",
+        text: "El PDF se ha actualizado correctamente.",
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Hubo un problema al actualizar el PDF.",
+      });
+    }
+  };
+
+  // Función para manejar la actualización completa
+  const handleUpdate = async () => {
+    await handleUpdateBook(); // Actualizar datos básicos si hay cambios
+    if (nuevaImagen) await handleUpdatePortada(); // Actualizar portada si hay una nueva
+    if (nuevoPDF) await handleUpdatePDF(); // Actualizar PDF si hay uno nuevo
+
+    navigate("/"); // Redirigir a la página principal
   };
 
   return (
     <div className="container-fluid details">
       <div className="display-1 text-light my-4">ACTUALIZAR</div>
       <div className="row details-content px-5 py-5">
+        <h2>{book.nombre}</h2>
         <div className="col-md-4">
           {/* Imagen de la portada */}
-          <img src={portada} alt={nombre} className="img-fluid" />
+          <img src={book.portada_url} alt={nombre} className="img-fluid" />
           {/* Campo para actualizar la imagen */}
           <input
             type="file"
@@ -122,7 +242,7 @@ function UpdateBook({ data }: BooksProps) {
         </div>
         <div className="col-md-8">
           {/* Nombre del libro */}
-          <h1>{book.Nombre}</h1>
+          <h1>{book.nombre}</h1>
           <input
             type="text"
             value={nombre}
@@ -132,7 +252,7 @@ function UpdateBook({ data }: BooksProps) {
           />
 
           {/* Nombre del autor */}
-          <p className="text-muted">Autor: {book.Autor}</p>
+          <p className="text-muted">Autor: {book.autor}</p>
           <input
             type="text"
             value={autor}
@@ -142,7 +262,7 @@ function UpdateBook({ data }: BooksProps) {
           />
 
           {/* Sinopsis del libro */}
-          <p className="lead">{book.Sinopsis}</p>
+          <p className="lead">{book.sinopsis}</p>
           <textarea
             value={sinopsis}
             onChange={(e) => setSinopsis(e.target.value)}
@@ -151,7 +271,7 @@ function UpdateBook({ data }: BooksProps) {
           />
 
           {/* Año de publicación */}
-          <p className="text-muted">Año: {book.Año}</p>
+          <p className="text-muted">Año: {book.anio}</p>
           <input
             type="number"
             value={año}

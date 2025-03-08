@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { TrophySpin } from "react-loading-indicators";
 import UpdateBook from "./components/Startpage/Manager/UpdateBook/UpdateBook";
 import AddBook from "./components/Startpage/Manager/AddBook/AddBook";
+import { endpoint } from "./main";
 
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
     // Función para obtener los datos del backend
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:3001/books/');
+        const response = await fetch(`${endpoint}/books`); // Hacer la petición al backend
         if (!response.ok) {
           throw new Error('Error al obtener los datos');
         }
@@ -48,7 +49,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/" element={<Startpage data={books} />} />
-        <Route path="/details/:id" element={<Details data={books} />} />
+        <Route path="/details/:id" element={<Details/>} />
         <Route path="/update/:id" element={<UpdateBook data={books}/>} />
         <Route path="/add" element={<AddBook/>} />
       </Routes>

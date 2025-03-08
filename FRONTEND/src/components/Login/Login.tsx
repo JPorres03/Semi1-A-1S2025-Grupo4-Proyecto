@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import img from '../../assets/login.jpg';
+import { endpoint } from '../../main';
 
 
 function Login() {
@@ -23,7 +24,7 @@ function Login() {
         }
 
         try {
-            const response = await fetch('http://localhost:3001/auth/login', {
+            const response = await fetch(`${endpoint}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import img from '../../../assets/profile.png';
 import { CiEdit } from "react-icons/ci";
+import { endpoint } from "../../../main";
 
 function Profile() {
-    const user = sessionStorage.getItem("user"); // Obtener el ID del usuario desde sessionStorage
-    const userId = user ? JSON.parse(user).id : null;
+    const user = sessionStorage.getItem("user"); // Obtener la cadena JSON
+    const usuario = user ? JSON.parse(user) : null; // Parsear la cadena JSON a un objeto
 
     // Estados para los datos del perfil
     const [nombres, setNombres] = useState<string>("Name");
@@ -17,25 +18,34 @@ function Profile() {
     const [editFoto, setEditFoto] = useState<boolean>(false);
     const [editNombres, setEditNombres] = useState<boolean>(false);
     const [editCorreo, setEditCorreo] = useState<boolean>(false);
+    const [books, setBooks] = useState(0);
 
     // Obtener los datos del perfil al montar el componente
     useEffect(() => {
         const fetchProfile = async () => {
-            if (!userId) return;
+            if (!usuario || !usuario.user_id) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "No se pudo obtener el ID del usuario.",
+                });
+                return;
+            }
 
             try {
-                const response = await fetch(`http://localhost:3001/users/profile/${userId}`);
+                const response = await fetch(`${endpoint}/users/profile/${usuario.user_id}`);
                 if (!response.ok) {
                     throw new Error("Error al obtener los datos del perfil");
                 }
 
                 const data = await response.json();
-                setNombres(data.nombres);
-                setApellidos(data.apellidos);
-                setCorreo(data.email);
-                setFechaNacimiento(data.fecha_nacimiento);
-                // Si el servidor devuelve una URL de la imagen de perfil, puedes usarla aquí:
-                // setFotoPerfil(data.fotoPerfil || img);
+                
+                // Actualizar los estados con los datos recibidos
+                setNombres(data.nombres || "Name");
+                setApellidos(data.apellidos || "Lastname");
+                setCorreo(data.email || "example@example.com");
+                setFechaNacimiento(data.fecha_nacimiento || "unknown");
+                setFotoPerfil(data.foto_perfil_url || img); // Usar la imagen del servidor o la predeterminada
             } catch (error) {
                 console.error("Error:", error);
                 Swal.fire({
@@ -44,10 +54,18 @@ function Profile() {
                     text: "Hubo un problema al obtener los datos del perfil.",
                 });
             }
+
+            try {
+                const response = await fetch(`${endpoint}/users/books/${usuario.user_id}`);
+                const data = await response.json();
+
+                // Actualizar los estados con los datos recibidos
+                setBooks(data.total_books || 0);
+            } catch (error) {}
         };
 
         fetchProfile();
-    }, [userId]); // Dependencia: userId
+    }, [usuario?.user_id]); // Dependencia: usuario.user_id
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files ? e.target.files[0] : null;
@@ -57,8 +75,9 @@ function Profile() {
         }
     };
 
+    // Función para actualizar la foto de perfil
     const handleUpdateImage = async () => {
-        if (!nuevaImagen || !userId) {
+        if (!nuevaImagen || !usuario || !usuario.user_id) {
             Swal.fire({
                 icon: "error",
                 title: "Error",
@@ -69,9 +88,9 @@ function Profile() {
 
         try {
             const formData = new FormData();
-            formData.append("image", nuevaImagen);
+            formData.append("nueva_foto", nuevaImagen);
 
-            const response = await fetch(`http://localhost:3001/users/profile/${userId}/image`, {
+            const response = await fetch(`${endpoint}/users/profile/update_foto/${usuario.user_id}`, {
                 method: "PUT",
                 body: formData,
             });
@@ -98,8 +117,9 @@ function Profile() {
         }
     };
 
-    const handleUpdate = async (field: string, value: string) => {
-        if (!userId) {
+    // Función para actualizar los datos del perfil
+    const handleUpdateProfile = async () => {
+        if (!usuario || !usuario.user_id) {
             Swal.fire({
                 icon: "error",
                 title: "Error",
@@ -108,13 +128,27 @@ function Profile() {
             return;
         }
 
+        const updatedFields: any = {};
+
+        // Verificar si los campos han cambiado
+        if (nombres !== usuario.nombres) updatedFields.nombres = nombres;
+        if (apellidos !== usuario.apellidos) updatedFields.apellidos = apellidos;
+        if (correo !== usuario.email) updatedFields.email = correo;
+        if (fechaNacimiento !== usuario.fecha_nacimiento) updatedFields.fecha_nacimiento = fechaNacimiento;
+
+        // Si no hay campos actualizados, no hacer la petición
+        if (Object.keys(updatedFields).length === 0) {
+            console.log("No hay campos para actualizar.");
+            return;
+        }
+
         try {
-            const response = await fetch(`http://localhost:3001/users/profile/${userId}`, {
+            const response = await fetch(`${endpoint}/users/profile/${usuario.user_id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ [field]: value }), // Enviar el campo y su valor
+                body: JSON.stringify(updatedFields),
             });
 
             if (!response.ok) {
@@ -134,6 +168,18 @@ function Profile() {
                 text: "Hubo un problema al actualizar el perfil.",
             });
         }
+    };
+
+    // Función para manejar la actualización de los nombres
+    const handleUpdateNombres = () => {
+        handleUpdateProfile(); // Actualizar el perfil
+        setEditNombres(false); // Desactivar el modo de edición
+    };
+
+    // Función para manejar la actualización del correo
+    const handleUpdateCorreo = () => {
+        handleUpdateProfile(); // Actualizar el perfil
+        setEditCorreo(false); // Desactivar el modo de edición
     };
 
     return (
@@ -163,14 +209,11 @@ function Profile() {
                                 type="text"
                                 value={nombres}
                                 onChange={(e) => setNombres(e.target.value)}
-                                onBlur={() => {
-                                    setEditNombres(false);
-                                    handleUpdate("nombres", nombres);
-                                }}
+                                onBlur={handleUpdateNombres}
                                 autoFocus
                             />
                         ) : (
-                            <>{nombres} {apellidos} <button className="btn btn-success" onClick={() => setEditNombres(true)}><CiEdit /></button></>
+                            <>{nombres} <button className="btn btn-success" onClick={() => setEditNombres(true)}><CiEdit /></button></>
                         )}
                     </h2>
                     <h3 className="py-2">
@@ -179,10 +222,7 @@ function Profile() {
                                 type="email"
                                 value={correo}
                                 onChange={(e) => setCorreo(e.target.value)}
-                                onBlur={() => {
-                                    setEditCorreo(false);
-                                    handleUpdate("email", correo);
-                                }}
+                                onBlur={handleUpdateCorreo}
                                 autoFocus
                             />
                         ) : (
@@ -190,7 +230,7 @@ function Profile() {
                         )}
                     </h3>
                     <h4 className="py-2">Fecha de nacimiento: {fechaNacimiento}</h4>
-                    <h4 className="py-2">Libros adquiridos <strong className="fs-2 mx-3">3</strong></h4>
+                    <h4 className="py-2">Libros adquiridos <strong className="fs-2 mx-3">{books}</strong></h4>
                 </div>
             </div>
         </section>

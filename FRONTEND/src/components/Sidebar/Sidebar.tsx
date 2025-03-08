@@ -1,24 +1,19 @@
 import React from 'react';
 
+
 // Definimos el tipo de las props
 interface SidebarProps {
   onSidebarClick: (option: string) => void;
 }
 
-// Definimos el tipo del usuario
-interface User {
-  name: string;
-  // Agrega otras propiedades del usuario si es necesario
-}
 
 // Componente Sidebar con TypeScript
 const Sidebar: React.FC<SidebarProps> = ({ onSidebarClick }) => {
-  // Obtener el usuario desde sessionStorage
-  const userString = sessionStorage.getItem('user');
-  const user: User | null = userString ? JSON.parse(userString) : null;
+  const user = sessionStorage.getItem("user"); // Obtener la cadena JSON
+  const usuario = user ? JSON.parse(user) : false; // Parsear la cadena JSON a un objeto
 
   // Verificar si el usuario es un administrador
-  const isAdmin = user?.name === 'admin';
+  const isAdmin = usuario.role === "Admin" ? true : false;
 
   return (
     <section className="nav">
@@ -39,7 +34,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onSidebarClick }) => {
           </button>
         </li>
         {/* Mostrar la opción "Administrar" solo si el usuario es un administrador */}
-        {!isAdmin && (
+        {isAdmin && (
           <li>
             <button className="text-center fs-6" onClick={() => onSidebarClick('manage')}>
               Administrar

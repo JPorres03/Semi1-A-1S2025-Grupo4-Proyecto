@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Navbar from "../Navbar/Navbar";
@@ -9,18 +9,30 @@ import Manager from "./Manager/Manager";
 
 interface Book {
   id: number;
-  Nombre: string;
-  Portada: string;
-  Sinopsis: string;
-  Autor: string;
-  Año: number;
-  PDF: string;
-  Estado: boolean;
+  nombre: string;
+  portada_url: string;
+  sinopsis: string;
+  autor: string;
+  anio: number;
+  estado: boolean;
+  pdf_url: string;
   categoria: string[];
 }
 
+
+
+
 function Startpage({ data }: { data: Book[] }) {
   let navigate = useNavigate();
+
+  useEffect(() => {
+    // Verificar si el usuario está autenticado
+    const user = sessionStorage.getItem("user");
+    if (!user) {
+      navigate("/login");
+    }
+  }, []);
+
   const [content, setContent] = useState<React.ReactNode>(
     <Books data={data} showAcquiredOnly={false} />
   );

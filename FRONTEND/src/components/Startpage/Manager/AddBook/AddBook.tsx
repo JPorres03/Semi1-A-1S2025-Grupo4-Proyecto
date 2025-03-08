@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import img from "../../../../assets/add.jpg";
+import { endpoint } from "../../../../main";
 
 function AddBook() {
     const navigate = useNavigate();
@@ -12,6 +13,42 @@ function AddBook() {
     const [autor, setAutor] = useState<string>("");
     const [año, setAño] = useState<string>("");
     const [pdf, setPDF] = useState<File | null>(null);
+    const [categorias, setCategorias] = useState<{ id: number; nombre: string }[]>([]);
+    const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState<number[]>([]); // Estado temporal para las IDs seleccionadas
+
+    // Obtener las categorías al montar el componente
+    useEffect(() => {
+        const fetchCategorias = async () => {
+            try {
+                const response = await fetch(`${endpoint}/categories`);
+                if (!response.ok) {
+                    throw new Error("Error al obtener las categorías");
+                }
+                const data = await response.json();
+                setCategorias(data);
+            } catch (error) {
+                console.error("Error:", error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Hubo un problema al obtener las categorías.",
+                });
+            }
+        };
+
+        fetchCategorias();
+    }, []);
+
+    // Manejar la selección de categorías
+    const handleCategoriaClick = (id: number) => {
+        setCategoriasSeleccionadas((prev) => {
+            if (prev.includes(id)) {
+                return prev.filter((catId) => catId !== id); // Deseleccionar
+            } else {
+                return [...prev, id]; // Seleccionar
+            }
+        });
+    };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files ? e.target.files[0] : null;
@@ -35,15 +72,17 @@ function AddBook() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!nombre || !portada || !sinopsis || !autor || !año || !pdf) {
+        // Verificar campos obligatorios
+        if (!nombre || !portada || !sinopsis || !autor || !año || !pdf || categoriasSeleccionadas.length === 0) {
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
-                text: "Por favor, completa todos los campos.",
+                text: "Por favor, completa todos los campos y selecciona al menos una categoría.",
             });
             return;
         }
 
+        // Validar año
         if (!validateYear(año)) {
             Swal.fire({
                 icon: "error",
@@ -53,16 +92,25 @@ function AddBook() {
             return;
         }
 
+        
+        // Crear FormData
         const formData = new FormData();
-        formData.append("Nombre", nombre);
-        formData.append("Portada", portada);
-        formData.append("Sinopsis", sinopsis);
-        formData.append("Autor", autor);
-        formData.append("Año", año);
-        formData.append("PDF", pdf);
+        formData.append("nombre", nombre);
+        formData.append("portada", portada);
+        formData.append("sinopsis", sinopsis);
+        formData.append("autor", autor);
+        formData.append("anio_publicacion", año);
+        formData.append("pdf", pdf);
+        categoriasSeleccionadas.forEach((categoriaId) => {
+            formData.append("categorias", categoriaId.toString());
+        });
+        
 
+        console.log("Form data:", ...formData);
+
+        // Enviar la petición
         try {
-            const response = await fetch("https://tu-backend.com/api/books", {
+            const response = await fetch(`${endpoint}/admin/books`, {
                 method: "POST",
                 body: formData,
             });
@@ -116,6 +164,25 @@ function AddBook() {
                 <div className="mb-3">
                     <label htmlFor="pdf" className="form-label">Archivo PDF</label>
                     <input type="file" id="pdf" className="form-control" accept="application/pdf" onChange={handlePDFChange} required />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label">Categorías</label>
+                    <div className="d-flex flex-wrap gap-2">
+                        {categorias.map((categoria) => (
+                            <button
+                                key={categoria.id}
+                                type="button"
+                                className={`btn ${
+                                    categoriasSeleccionadas.includes(categoria.id)
+                                        ? "btn-primary"
+                                        : "btn-outline-primary"
+                                }`}
+                                onClick={() => handleCategoriaClick(categoria.id)}
+                            >
+                                {categoria.nombre}
+                            </button>
+                        ))}
+                    </div>
                 </div>
                 <button type="submit" className="btn btn-success">Agregar libro</button>
                 <button className="btn btn-warning ms-2" onClick={() => navigate("/")}>Regresar</button>

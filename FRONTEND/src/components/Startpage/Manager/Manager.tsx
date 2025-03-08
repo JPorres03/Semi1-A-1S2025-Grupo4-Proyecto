@@ -2,18 +2,20 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { IoIosAddCircle } from "react-icons/io";
 import Swal from "sweetalert2";
+import { endpoint } from "../../../main";
 
 
 interface Book {
     id: number;
-    Nombre: string;
-    Portada: string;
-    Sinopsis: string;
-    Autor: string;
-    Año: number;
-    PDF: string;
-    Estado: boolean;
-}
+    nombre: string;
+    portada_url: string;
+    sinopsis: string;
+    autor: string;
+    anio: number;
+    estado: boolean;
+    pdf_url: string;
+    categoria: string[];
+  }
 
 interface BooksProps {
     data: Book[];
@@ -41,7 +43,7 @@ function Manager({ data }: BooksProps) {
         if (result.isConfirmed) {
             try {
                 // Realizar la petición de eliminación al backend
-                const response = await fetch(`https://tu-backend.com/api/books/${id}`, {
+                const response = await fetch(`${endpoint}/admin/books/${id}`, {
                     method: "DELETE",
                 });
 
@@ -73,16 +75,16 @@ function Manager({ data }: BooksProps) {
     return (
         <section className="books-container">
             <div className="books">
-                <button className="add-button" onClick={() => navigate("/add")}>
+                <button className="btn btn-light add-button" onClick={() => navigate("/add")}>
                     <IoIosAddCircle className="add" />
                 </button>
 
                 {books.map((book: Book) => (
                     <div key={book.id} className="book-card">
                         {/* Mostrar siempre la portada, nombre y autor */}
-                        <img src={book.Portada} alt={book.Nombre} className="book-cover" />
-                        <h2 className="book-title">{book.Nombre}</h2>
-                        <p className="book-author">{book.Autor}</p>
+                        <img src={book.portada_url} alt={book.nombre} className="book-cover" />
+                        <h2 className="book-title">{book.nombre}</h2>
+                        <p className="book-author">{book.autor}</p>
                         <div className="manager-buttons">
                             <button
                                 type="button"

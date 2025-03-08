@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { endpoint } from '../../main';
 
 function Register() {
     const [nombres, setNombres] = useState<string>('');
@@ -47,13 +48,14 @@ function Register() {
         formData.append('apellidos', apellidos);
         formData.append('email', email);
         formData.append('password', password);
-        formData.append('fechaNacimiento', fechaNacimiento);
+        formData.append('rol', 'usuario'); // Asignar el rol de usuario por defecto
+        formData.append('fecha_nacimiento', fechaNacimiento);
         if (fotoPerfil) {
-            formData.append('fotoPerfil', fotoPerfil); // Agregar la imagen como archivo
+            formData.append('foto_perfil', fotoPerfil); // Agregar la imagen como archivo
         }
 
         try {
-            const response = await fetch('http://localhost:3001/auth/register', {
+            const response = await fetch(`${endpoint}/auth/register`, {
                 method: 'POST',
                 body: formData, // Enviar el FormData directamente
             });
