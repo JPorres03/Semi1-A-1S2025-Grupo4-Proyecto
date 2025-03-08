@@ -37,7 +37,7 @@ def register_controller():
         password = request.form.get('password')
         # foto 
         fecha_nacimeinto = request.form.get('fecha_nacimiento')
-        rol = request.form.get('rol')
+        rol1 = request.form.get('rol')
 
         foto_perfil=request.files.get('foto_perfil')
 
@@ -77,7 +77,7 @@ def register_controller():
             password_hash=password,
             foto_perfil_url=foto_url,
             fecha_nacimiento=fecha_nacimeinto,
-            rol=rol
+            rol=rol1
         )
 
         new_user.set_password(new_user.password_hash)

@@ -9,15 +9,31 @@ from src.models.CategoryBooks import CategoryBooks
 
 def all_books_controller():
     try:
-        books = Book.query.all()
+        books = db.session.query(Book)\
+            .options(
+                joinedload(Book.libros_categorias)  # Cargar la relación libros_categorias
+                .joinedload(CategoryBooks.categoria)  # Cargar la categoría desde la tabla intermedia
+            )
 
         books_list = []
         for book in books:
+            # sacar categorias
+            categoria_list = [
+                {
+                    "id": cd.categoria.id,
+                    "nombre": cd.categoria.nombre
+                }
+                for cd in book.libros_categorias
+            ]
             data_book = {
                 "id": book.id,
                 "nombre": book.nombre,
                 "autor": book.autor,
-                "portada_url": book.portada_url
+                "portada_url": book.portada_url,
+                "sinopsis": book.sinopsis,
+                "pdf_url": book.pdf_url,
+                "anio_publicacion": book.anio_publicacion,
+                "categorias": categoria_list
             }
             books_list.append(data_book)
 
