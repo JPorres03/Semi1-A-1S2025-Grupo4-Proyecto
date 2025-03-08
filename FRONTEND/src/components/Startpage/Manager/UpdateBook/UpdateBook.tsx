@@ -15,8 +15,6 @@ interface Book {
   categoria: string[];
 }
 
-const user = sessionStorage.getItem("user"); // Obtener la cadena JSON
-const usuario = user ? JSON.parse(user) : null; // Parsear la cadena JSON a un objeto
 
 function UpdateBook() {
   const navigate = useNavigate();

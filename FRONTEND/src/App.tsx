@@ -50,7 +50,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/" element={<Startpage data={books} />} />
         <Route path="/details/:id" element={<Details/>} />
-        <Route path="/update/:id" element={<UpdateBook data={books}/>} />
+        <Route path="/update/:id" element={<UpdateBook/>} />
         <Route path="/add" element={<AddBook/>} />
       </Routes>
     </BrowserRouter>
