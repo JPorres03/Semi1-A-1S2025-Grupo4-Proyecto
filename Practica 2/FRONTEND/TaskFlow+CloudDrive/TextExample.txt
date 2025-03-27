@@ -23,7 +23,7 @@ function Home() {
     <>
       <div className="homeContainer d-flex flex-column">
         <Navbar onNavbarClick={handleNavbarClick} />
-        <div className="mt-4 mx-3">
+        <div className="mt-5 mx-3">
           {content}
         </div>
       </div>
