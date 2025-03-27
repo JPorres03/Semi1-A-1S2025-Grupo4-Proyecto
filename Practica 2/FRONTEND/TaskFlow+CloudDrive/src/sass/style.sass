@@ -1,0 +1,165 @@
+@import url('https://fonts.googleapis.com/css2?family=Delius&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap')
+
+#logo
+    filter: invert(39%) sepia(85%) saturate(906%) hue-rotate(145deg) brightness(104%) contrast(101%)
+    width: auto
+    height: auto
+
+/* -------------------------------------------------------------------------- */
+/*                                    LOGIN                                   */
+/* -------------------------------------------------------------------------- */
+.loginContainer
+    width: 100vw
+    height: 100vh
+    display: flex
+    justify-content: flex-start
+    form
+        display: flex
+        flex-direction: column
+        justify-content: flex-start
+        max-width: 600px
+        background-color: #222831
+        padding: 20px
+        label
+            font-family: "Open Sans", sans-serif
+            font-optical-sizing: auto
+            font-weight: 300
+            font-style: normal
+            font-variation-settings: "wdth" 100
+        input
+            border-radius: 0
+            &:hover
+                border-color: #00ADB5
+                box-shadow: 0 0 10px #00ADB5,0 0 20px #00ADB5
+                animation: neon-pulse 1.5s infinite alternate
+        button
+            background-color: #00ADB5
+            border-radius: 0
+            color: #222831
+            border: none
+            &:hover
+                border-color: #00ADB5
+                background-color: #222831
+                color: #00ADB5
+                box-shadow: 0 0 10px #00ADB5,0 0 20px #00ADB5
+                animation: neon-pulse 1.5s infinite alternate
+    img
+        width: 90%
+        height: auto
+
+/* -------------------------------------------------------------------------- */
+/*                                  REGISTER                                  */
+/* -------------------------------------------------------------------------- */
+.registerContainer
+    display: flex
+    justify-content: center
+    align-items: center
+    height: 100vh
+    width: 100vw
+    background-image: url('../assets/space2.jpg')
+    background-size: cover
+    background-repeat: no-repeat
+    background-position: center
+    background-attachment: fixed
+    form
+        display: flex
+        flex-direction: column
+        justify-content: flex-start
+        align-items: center
+        background-color: #222831
+        padding: 20px
+        max-width: 600px
+        height: 100vh
+        label
+            font-family: "Open Sans", sans-serif
+            font-optical-sizing: auto
+            font-weight: 300
+            font-style: normal
+            font-variation-settings: "wdth" 100
+        input
+            border-radius: 0
+            &:hover
+                border-color: #00ADB5
+                box-shadow: 0 0 10px #00ADB5,0 0 20px #00ADB5
+                animation: neon-pulse 1.5s infinite alternate
+        button
+            background-color: #00ADB5
+            border-radius: 0
+            color: #222831
+            border: none
+            width: 80%
+            &:hover
+                border-color: #00ADB5
+                background-color: #222831
+                color: #00ADB5
+                box-shadow: 0 0 10px #00ADB5,0 0 20px #00ADB5
+                animation: neon-pulse 1.5s infinite alternate
+
+/* -------------------------------------------------------------------------- */
+/*                                   Navbar                                   */
+/* -------------------------------------------------------------------------- */
+.navbarContainer
+    background-color: #222831
+    display: flex
+    justify-content: space-around
+    align-items: center
+    height: 200px
+    img
+        width: 400px
+        height: auto
+    button
+        color: #EEEEEE
+        transition: all 0.3s ease // Suaviza los cambios
+        border: none
+
+    &:hover
+        background-color: #222831
+        color: #00ADB5
+        animation: neon-pulse 1.5s infinite alternate
+
+    // Mantiene el estilo neón después del clic (estado :active o :focus)
+    &:active, &:focus
+        color: #00ADB5 !important // Fuerza el color neón
+        animation: none // Opcional: Detiene la animación al hacer clic
+
+// Animación neón (si no la tienes definida)
+@keyframes neon-pulse
+    from
+        text-shadow: 0 0 5px #00ADB5, 0 0 10px #00ADB5
+
+    to
+        text-shadow: 0 0 15px #00ADB5, 0 0 30px #00ADB5
+
+// Estilo para el estado "clickeado"
+.neon-active
+    color: #00ADB5 !important
+    text-shadow: 0 0 10px #00ADB5
+
+/* -------------------------------------------------------------------------- */
+/*                                    HOME                                    */
+/* -------------------------------------------------------------------------- */
+.homeContainer
+    background-color: #393E46
+    width: 100vw
+    height: 100vh
+
+/* -------------------------------------------------------------------------- */
+/*                                  TaskList                                  */
+/* -------------------------------------------------------------------------- */
+.taskListContainer
+    display: flex
+    width: 100%
+    button
+        background-color: #00ADB5
+        border-radius: 0
+        color: #222831
+        border: none
+        width: 10%
+        &:hover
+            border-color: #00ADB5
+            background-color: #222831
+            color: #00ADB5
+            box-shadow: 0 0 10px #00ADB5,0 0 20px #00ADB5
+            animation: neon-pulse 1.5s infinite alternate
+    div
+        width: 100%
