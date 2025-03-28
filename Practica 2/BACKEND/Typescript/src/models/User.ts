@@ -2,6 +2,8 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Task } from "./Task";
 import { File } from "./File";
 
+
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -17,11 +19,7 @@ export class User {
   password!: string;
 
   @Column({ length: 250, nullable: true })
-  profilePictureUrl!: string;
+  profile_picture_url!: string;
 
-  @OneToMany(() => Task, (task) => task.user, { cascade: true })
-  tasks!: Task[];
-
-  @OneToMany(() => File, (file) => file.user, { cascade: true })
-  files!: File[];
+  
 }

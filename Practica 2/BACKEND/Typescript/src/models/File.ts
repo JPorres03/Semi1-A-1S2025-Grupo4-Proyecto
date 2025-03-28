@@ -9,6 +9,5 @@ export class File {
   @Column({ length: 500 })
   url!: string;
 
-  @ManyToOne(() => User, (user) => user.files, { onDelete: "CASCADE" })
-  user!: User;
+
 }

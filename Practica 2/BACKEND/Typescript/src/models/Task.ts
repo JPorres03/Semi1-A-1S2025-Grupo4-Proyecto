@@ -15,9 +15,5 @@ export class Task {
   @Column({ default: false })
   status!: boolean;
 
-  @CreateDateColumn({ type: "timestamp" })
-  createdAt!: Date;
 
-  @ManyToOne(() => User, (user) => user.tasks, { onDelete: "CASCADE" })
-  user!: User;
 }

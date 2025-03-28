@@ -1,7 +1,9 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import dotenv from 'dotenv';
-
+import { User } from '../../models/User';
+import { Task } from '../../models/Task';
+import { File } from '../../models/File';
 
 dotenv.config();
 
@@ -13,9 +15,9 @@ export const AppDataSource = new DataSource({
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    synchronize: false, // Solo para desarrollo (crea tablas automáticamente)
+    synchronize: false,
     logging: false,
-    entities: [__dirname + '/entities/*.ts'], // Carpeta donde están las entidades
+    entities: [User,Task,File],
     migrations: [__dirname + '/migrations/*.ts'],
     subscribers: [],
   });

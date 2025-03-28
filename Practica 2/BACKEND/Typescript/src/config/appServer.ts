@@ -3,6 +3,7 @@ import cors from 'cors'
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 import { AppDataSource } from '../config/databases/mysql';
+import { authRouter } from '../routes/auth.routes';
 
 dotenv.config();
 
@@ -30,6 +31,8 @@ app.get('/version', (req, res) => {
 });
 
 //Rutas
+
+app.use('/api/auth',authRouter);
 
 //inicializamos el proyecto con appdatasourec
 AppDataSource.initialize().then(() => {
