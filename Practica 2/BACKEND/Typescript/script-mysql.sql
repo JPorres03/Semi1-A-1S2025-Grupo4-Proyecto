@@ -1,0 +1,31 @@
+CREATE DATABASE semi_p2;
+USE semi_p2;
+
+CREATE TABLE `User` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `username` VARCHAR(150) UNIQUE NOT NULL,
+  `email` VARCHAR(200) UNIQUE NOT NULL,
+  `password` VARCHAR(150) NOT NULL,
+  `profile_picture_url` VARCHAR(250)
+);
+
+CREATE TABLE `Task` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `id_user` INT NOT NULL,
+  `title` VARCHAR(150) NOT NULL,
+  `description` VARCHAR(300),
+  `status` BOOLEAN DEFAULT FALSE,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`id_user`) REFERENCES `User` (`id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `File` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` INT NOT NULL,
+  `url` VARCHAR(500) NOT NULL,
+  FOREIGN KEY (`user_id`) REFERENCES `User` (`id`) ON DELETE CASCADE
+);
+
+ALTER TABLE `Task` ADD FOREIGN KEY (`id_user`) REFERENCES `User` (`id`);
+
+ALTER TABLE `File` ADD FOREIGN KEY (`user_id`) REFERENCES `User` (`id`);
