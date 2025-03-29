@@ -1,19 +1,22 @@
-import { error } from "console";
+
+import { Request, Response } from 'express';
 import { AppDataSource } from "../config/databases/mysql";
 import { User } from "../models/User";
 import bcrypt from "bcrypt";
 
 
-export const register = async (req: any, res: any) => {
+export const register = async (req: Request, res: Response) => {
 
     try {
         const { username, email, password, confirm_password } = req.body;
 
         if (!username || !email || !password || !confirm_password) {
-            return res.status(400).json({ message: "All fields are required" });
+            res.status(400).json({ message: "All fields are required" });
+            return
         }
         if (password !== confirm_password) {
-            return res.status(400).json({ message: "Passwords do not match" });
+            res.status(400).json({ message: "Passwords do not match" });
+            return
         }
         const user = await AppDataSource.manager
             .createQueryBuilder(User, "user")
@@ -22,7 +25,8 @@ export const register = async (req: any, res: any) => {
             .getOne();
 
         if (user) {
-            return res.status(400).send({ message: "User already exists", error: true });
+            res.status(400).send({ message: "User already exists", error: true });
+            return
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -35,20 +39,23 @@ export const register = async (req: any, res: any) => {
 
         await AppDataSource.manager.save(newUser);
 
-        return res.status(201).json({ message: "User created successfully", user: newUser });
+        res.status(201).json({ message: "User created successfully", user: newUser });
+        return
 
 
     } catch (error) {
-        return res.status(500).json({ message: "Error creating user", error });
+        res.status(500).json({ message: "Error creating user", error });
+        return
     }
 }
 
-export const login = async (req: any, res: any) => {
+export const login = async (req: Request, res: Response) => {
     try {
         const { username, password } = req.body;
 
         if (!username || !password) {
-            return res.status(400).json({ message: "All fields are required" });
+            res.status(400).json({ message: "All fields are required" });
+            return
         }
 
         const user = await AppDataSource.manager
@@ -57,17 +64,21 @@ export const login = async (req: any, res: any) => {
             .getOne();
 
         if (!user) {
-            return res.status(400).json({ message: "User not found" ,error: true});
+            res.status(400).json({ message: "User not found", error: true });
+            return
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-            return res.status(400).json({ message: "Invalid credentials" ,error: true});
+            res.status(400).json({ message: "Invalid credentials", error: true });
+            return
         }
 
-        return res.status(200).json({ message: "Login successful", data:user ,error:false});
+        res.status(200).json({ message: "Login successful", data: user, error: false });
+        return
     } catch (error) {
-        return res.status(500).json({ message: "Error logging in", error });
+        res.status(500).json({ message: "Error logging in", error });
+        return
     }
 }

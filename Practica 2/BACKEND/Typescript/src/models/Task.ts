@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from "typeorm";
-import { User } from "./User";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+
 
 @Entity()
 export class Task {
@@ -15,5 +15,11 @@ export class Task {
   @Column({ default: false })
   status!: boolean;
 
-
+  @Column({ 
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP'
+  })
+  created_at!: Date;
 }
+
+
