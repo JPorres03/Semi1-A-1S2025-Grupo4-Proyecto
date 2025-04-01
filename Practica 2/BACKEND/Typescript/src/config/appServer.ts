@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { AppDataSource } from '../config/databases/mysql';
 import { authRouter } from '../routes/auth.routes';
 import { taskRouter } from '../routes/task.routes';
+import { filesRouter } from '../routes/files.routes';
 
 dotenv.config();
 
@@ -36,6 +37,8 @@ app.get('/version', (req, res) => {
 app.use('/api/auth',authRouter);
 
 app.use('/api/task', taskRouter)
+
+app.use('/api/files', filesRouter)
 
 //inicializamos el proyecto con appdatasourec
 AppDataSource.initialize().then(() => {

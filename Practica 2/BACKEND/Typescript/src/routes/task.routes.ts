@@ -1,4 +1,3 @@
-import { create } from 'domain';
 import { Router } from 'express';
 import { completeTask, createTask, deleteTask, editTask, obtainAllTask } from '../controller/task.controller';
 
@@ -14,15 +13,15 @@ router.get(
     '/:id',
     obtainAllTask
 )
-router.put('/:id',
+router.put('/update/:id',
     editTask
 )
 
-router.delete('/:id',
+router.delete('/delete/:id',
     deleteTask
 )
 
-router.patch('/:id/complete',
+router.patch('/complete/:id',
     completeTask
 )
 
