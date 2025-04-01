@@ -1,4 +1,4 @@
-## Despliegue
+# DESPLIEGE 
 ```bash
 sudo apt update -y
 sudo apt install -y git
@@ -16,7 +16,15 @@ source ~/.bashrc
 
 
 #Clona repo
+git clone https://github.com/JPorres03/Semi1-A-1S2025-Grupo4-Practica1.git
 
-
+# raiz api
+cd /Semi1-A-1S2025-Grupo4-Practica1/Practica 2/BACKEND/AspNet/
+#crea compilado
+dotnet publish -c Release -o ./publish
+# ruta compilado
+cd publish
+# ejecuta
+dotnet AspNet.dll
 
 ```
