@@ -15,5 +15,8 @@ export PATH=$PATH:$HOME/.dotnet
 source ~/.bashrc
 
 
+#Clona repo
+
+
 
 ```
