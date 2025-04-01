@@ -23,6 +23,11 @@ namespace AspNet
                 );
             });
 
+            if (builder.Environment.IsProduction())
+            {
+                builder.WebHost.UseUrls("http://*:3001");
+            }
+
             var app = builder.Build();
 
             app.MapControllers();
