@@ -1,10 +1,13 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 
-@Entity()
+@Entity({ name: "Task" }) 
 export class Task {
   @PrimaryGeneratedColumn()
   id!: number;
+
+  @Column()
+  id_user!: number;
 
   @Column({ length: 150 })
   title!: string;

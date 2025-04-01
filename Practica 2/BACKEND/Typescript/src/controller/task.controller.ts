@@ -9,22 +9,25 @@ import { error } from 'console';
 export const createTask = async (req: Request, res: Response) => {
 
     try {
-        const { title, description, creation_date } = req.body;
+        const { id } = req.params
 
-        if (!title || !description || !creation_date) {
-            res.status(400).json({ message: "All fields are required: title and description " });
+        const { title, description } = req.body;
+
+        if (!title || !description || !id) {
+            res.status(400).json({ message: "All fields are required: title and id " });
             return;
         }
         const task = await AppDataSource.manager
             .createQueryBuilder(Task, "task")
             .where("task.title = :title", { title })
+            .andWhere("task.id_user = :id", { id })
             .getOne();
-        
+
         if (task) {
             res.status(400).json({ message: "Task already exists", error: true });
             return;
         }
-            
+
         const newTask: Task_interface = {
             title,
             description,
@@ -35,9 +38,10 @@ export const createTask = async (req: Request, res: Response) => {
         newtask.title = newTask.title;
         newtask.description = newTask.description;
         newtask.status = newTask.status;
+        newtask.id_user = parseInt(id)
 
         await AppDataSource.manager.save(newtask);
-        res.status(201).json({ message: "Task created successfully", task, error: false });
+        res.status(201).json({ message: "Task created successfully", newtask, error: false });
         return
 
     } catch (error: any) {
@@ -49,7 +53,7 @@ export const createTask = async (req: Request, res: Response) => {
 }
 
 export const editTask = async (req: Request, res: Response) => {
-    try{
+    try {
         const { id } = req.params;
         const { title, description } = req.body;
 
@@ -75,7 +79,7 @@ export const editTask = async (req: Request, res: Response) => {
         res.status(200).json({ message: "Task updated successfully", task, error: false });
         return
 
-    }catch(error){
+    } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Internal Server Error", error: true });
         return;
@@ -133,3 +137,30 @@ export const completeTask = async (req: Request, res: Response) => {
         return;
     }
 }
+
+export const obtainAllTask = async (req:Request,res:Response) => {
+
+    try {
+        const { id } = req.params;
+
+        // Obtiene todas las tareas asociadas al id_user
+        const allTasks = await AppDataSource.manager
+            .createQueryBuilder(Task, 'task')
+            .where("task.id_user = :id", { id: id })
+            .getMany();
+
+        // Verifica si no hay tareas
+        if (!allTasks || allTasks.length === 0) {
+            res.status(404).json({ message: "Tasks not found", error: true });
+            return;
+        }
+
+        // Devuelve las tareas encontradas
+        res.status(200).json({ message: "Tasks retrieved successfully", tasks: allTasks, error: false });
+        return;
+    } catch (error: any) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error", error: true });
+        return;
+    }
+} 

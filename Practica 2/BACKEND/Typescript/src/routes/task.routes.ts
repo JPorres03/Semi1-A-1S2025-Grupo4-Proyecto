@@ -1,15 +1,19 @@
 import { create } from 'domain';
 import { Router } from 'express';
-import { completeTask, createTask, deleteTask, editTask } from '../controller/task.controller';
+import { completeTask, createTask, deleteTask, editTask, obtainAllTask } from '../controller/task.controller';
 
 
 const router = Router();
 
 
-router.post('/',
+router.post('/:id/create',
     createTask
 )
 
+router.get(
+    '/:id',
+    obtainAllTask
+)
 router.put('/:id',
     editTask
 )
