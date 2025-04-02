@@ -11,6 +11,13 @@ namespace AspNet
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                });
+            });
 
             builder.Services.AddControllers();
   
@@ -30,6 +37,7 @@ namespace AspNet
 
             var app = builder.Build();
 
+            app.UseCors("AllowAll");
             app.MapControllers();
 
             app.Run();
