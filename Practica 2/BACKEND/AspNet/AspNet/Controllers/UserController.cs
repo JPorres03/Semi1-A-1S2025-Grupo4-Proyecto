@@ -46,7 +46,7 @@ namespace AspNet.Controllers
             _context.Users.Add(usuario);
             await _context.SaveChangesAsync();
 
-            return Ok(usuario);
+            return Ok(new {Message = "User created successfully", user = usuario});
         }
 
         [HttpPost("auth/login")]
@@ -67,7 +67,7 @@ namespace AspNet.Controllers
                 if (!isPasswordValid)
                     return Unauthorized(new { Message = "Credenciales invalidas" });
 
-                return Ok(new { Message = "Inicio de sesion exitoso" });
+                return Ok(new { Message = "Inicio de sesion exitoso", data = usuario, error = false });
             }catch(Exception ex)
             {
                 return StatusCode(500, $"Error Interno: { ex.Message}");

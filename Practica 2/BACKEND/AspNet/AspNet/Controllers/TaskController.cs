@@ -29,7 +29,12 @@ namespace AspNet.Controllers
             {
                 return NotFound(new { Message = "Este usuario no cuenta con tareas" });
             }
-            return Ok(tareas);
+            return Ok(new
+            {
+                Message = "Task retrieved successfully",
+                tasks = tareas,
+                error = false
+            });
         }
 
         [HttpPost("task/{id}/create")]
