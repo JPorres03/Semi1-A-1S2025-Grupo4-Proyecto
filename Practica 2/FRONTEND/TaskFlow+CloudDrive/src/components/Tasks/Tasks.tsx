@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
-import tasks from "../../../MOCK_DATA_TASKS.json";
 import Swal from 'sweetalert2';
 import Accordion from 'react-bootstrap/Accordion';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import Card from 'react-bootstrap/Card';
 
 interface Task {
   id: number;
   title: string;
   description: string;
-  creation_date: string;
-  completed: boolean;
+  created_at: string;
+  status: boolean;
 }
 
 function Tasks() {
@@ -19,32 +19,47 @@ function Tasks() {
   const [taskList, setTaskList] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
+  const userId = sessionStorage.getItem('userId');
 
+  // GET tasks from the server
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/task');
-        const data = await response.json();
+        setLoading(true);
+        const response = await fetch(`http://localhost:3001/api/task/${userId}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch tasks');
+        }
 
-        if (data) {
-          setTaskList(data);
+        const data = await response.json();
+        // Verificar si la respuesta es un array y tiene elementos
+        console.log('Fetched tasks:', data.tasks);
+
+        if (data && data.tasks.length > 0) {
+          setTaskList(data.tasks);
         } else {
-          setTaskList(tasks);
+          setTaskList([]); // Asegurarse que taskList esté vacío si no hay datos
         }
       } catch (error) {
         console.error('Error fetching tasks:', error);
-        setTaskList(tasks);
       } finally {
         setLoading(false);
       }
     };
 
     fetchTasks();
-  }, []);
+  }, [userId]);
 
+  // POST new task to the server
   const handleAddTask = async () => {
+    if (!title.trim()) {
+      Swal.fire('Warning!', 'Task title cannot be empty', 'warning');
+      return;
+    }
+
     try {
-      const response = await fetch('http://localhost:3001/api/task', {
+      const response = await fetch(`http://localhost:3001/api/task/${userId}/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -61,7 +76,13 @@ function Tasks() {
         setTaskList([...taskList, newTask]);
         setTitle('');
         setText('');
-        Swal.fire('Success!', 'Task added successfully', 'success');
+        Swal.fire({
+          title: 'Success!',
+          text: 'Task added successfully',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        });
       } else {
         throw new Error('Failed to add task');
       }
@@ -71,15 +92,20 @@ function Tasks() {
     }
   };
 
+  // PATCH update task status
   const handleToggleComplete = async (taskId: number) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/task/${taskId}/complete`, {
+      console.log("Task ID to toggle:", taskId);
+      const response = await fetch(`http://localhost:3001/api/task/complete/${taskId}`, {
         method: 'PATCH',
       });
 
       if (response.ok) {
+        const updatedTask = await response.json();
+        console.log('Updated task:', updatedTask.task.id);
+        
         setTaskList(taskList.map(task =>
-          task.id === taskId ? { ...task, completed: !task.completed } : task
+          task.id === updatedTask.task.id ? { ...task, completed: !task.status } : task
         ));
       } else {
         throw new Error('Failed to update task status');
@@ -119,25 +145,13 @@ function Tasks() {
       showCancelButton: true,
       confirmButtonText: 'Update',
       cancelButtonText: 'Cancel',
-      customClass: {
-        container: 'custom-swal-container',
-        popup: 'custom-swal-popup',
-        htmlContainer: 'custom-swal-html-container'
-      },
       width: '600px',
-      padding: '2rem',
-      backdrop: true,
-      showClass: {
-        popup: 'swal2-show'
-      },
-      hideClass: {
-        popup: 'swal2-hide'
-      }
+      padding: '2rem'
     });
 
     if (formValues) {
       try {
-        const response = await fetch(`http://localhost:3001/api/task/${taskId}`, {
+        const response = await fetch(`http://localhost:3001/api/task/update/${taskId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -160,7 +174,7 @@ function Tasks() {
             title: 'Success!',
             text: 'Task updated successfully',
             icon: 'success',
-            timer: 2000,
+            timer: 1500,
             showConfirmButton: false
           });
         } else {
@@ -168,12 +182,7 @@ function Tasks() {
         }
       } catch (error) {
         console.error('Error updating task:', error);
-        Swal.fire({
-          title: 'Error!',
-          text: 'Failed to update task',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
+        Swal.fire('Error!', 'Failed to update task', 'error');
       }
     }
   };
@@ -191,13 +200,19 @@ function Tasks() {
 
     if (result.isConfirmed) {
       try {
-        const response = await fetch(`http://localhost:3001/api/task/${taskId}`, {
+        const response = await fetch(`http://localhost:3001/api/task/delete/${taskId}`, {
           method: 'DELETE',
         });
 
         if (response.ok) {
           setTaskList(taskList.filter(task => task.id !== taskId));
-          Swal.fire('Deleted!', 'Your task has been deleted.', 'success');
+          Swal.fire({
+            title: 'Deleted!',
+            text: 'Your task has been deleted.',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+          });
         } else {
           throw new Error('Failed to delete task');
         }
@@ -230,61 +245,82 @@ function Tasks() {
         </div>
       </div>
 
-      <div className='listContainer mt-2'>
+      <div className='listContainer'>
+        <h2 className='mb-3 text-light'>Your Tasks</h2>
+        
         {loading ? (
-          <p>Loading tasks...</p>
+          <div className="text-center py-4">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="mt-2">Loading tasks...</p>
+          </div>
+        ) : taskList.length === 0 ? (
+          <Card className="text-center py-4">
+            <Card.Body>
+              <Card.Title>No tasks found</Card.Title>
+              <Card.Text>
+                You don't have any tasks yet. Create your first task above!
+              </Card.Text>
+              <Button variant="primary" onClick={() => {
+                document.querySelector('.newTask')?.scrollIntoView({ behavior: 'smooth' });
+              }}>
+                Create Task
+              </Button>
+            </Card.Body>
+          </Card>
         ) : (
           <Accordion
             activeKey={selectedTaskId?.toString()}
             onSelect={(e) => setSelectedTaskId(e ? Number(e) : null)}
             alwaysOpen={false}
           >
-            <div>
-              {taskList.map((task, index) => (
-                <Accordion.Item
-                  eventKey={index.toString()}
-                  key={task.id}
-                  className='mb-3'
-                >
-                  <Accordion.Header>
-                    <div className="d-flex align-items-center w-100">
-                      <Form.Check
-                        type="checkbox"
-                        checked={task.completed}
-                        onChange={() => handleToggleComplete(task.id)}
-                        onClick={(e) => e.stopPropagation()}
-                        className="me-3"
-                      />
-                      <div className="d-flex flex-column flex-grow-1">
-                        <span className='fs-4'>{task.title}</span>
-                        <small>
-                          Created: {new Date(task.creation_date).toLocaleDateString()}
-                        </small>
-                      </div>
+            {taskList.map((task) => (
+              <Accordion.Item
+                eventKey={task.id.toString()}
+                key={task.id}
+                className='mb-3'
+              >
+                <Accordion.Header>
+                  <div className="d-flex align-items-center w-100">
+                    <Form.Check
+                      type="checkbox"
+                      checked={task.status}
+                      onChange={() => handleToggleComplete(task.id)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="me-3"
+                    />
+                    <div className="d-flex flex-column flex-grow-1">
+                      <span className={`fs-4 ${task.status ? 'text-decoration-line-through text-muted' : ''}`}>
+                        {task.title}
+                      </span>
+                      <small className="text-muted">
+                        Created: {new Date(task.created_at).toLocaleDateString()}
+                      </small>
                     </div>
-                  </Accordion.Header>
-                  <Accordion.Body>
-                    <div>
-                      {task.description}
-                    </div>
-                    <div className="d-flex justify-content-end gap-2 mt-3">
-                      <Button
-                        className='btn btn-warning w-25'
-                        onClick={() => handleUpdateTask(task.id, task.title, task.description)}
-                      >
-                        Update
-                      </Button>
-                      <Button
-                        className='btn btn-danger w-25'
-                        onClick={() => handleDeleteTask(task.id)}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </Accordion.Body>
-                </Accordion.Item>
-              ))}
-            </div>
+                  </div>
+                </Accordion.Header>
+                <Accordion.Body>
+                  <div className={`mb-3 ${task.status ? 'text-muted' : ''}`}>
+                    {task.description || <em>No description provided</em>}
+                  </div>
+                  <div className="d-flex justify-content-end gap-2">
+                    <Button
+                      variant="warning"
+                      onClick={() => handleUpdateTask(task.id, task.title, task.description)}
+                    >
+                      Update
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={() => handleDeleteTask(task.id)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </Accordion.Body>
+              </Accordion.Item>
+            ))}
           </Accordion>
         )}
       </div>

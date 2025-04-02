@@ -3,12 +3,13 @@ import img from "../../../assets/space1.jpg"
 import logo from "../../../assets/main-logo-transparent.svg"
 import { RiLoginBoxFill } from "react-icons/ri";
 import Swal from 'sweetalert2';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // Nuevo estado para controlar la visibilidad de la contraseña
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault(); // Evita que el formulario recargue la página
@@ -57,13 +58,18 @@ function Login() {
       Swal.fire({
         icon: 'success',
         title: 'Login exitoso',
-        text: 'Bienvenido de nuevo!',
+        text: `Bienvenido de nuevo ${username}!`,
         showConfirmButton: false,
         timer: 1500
       });
 
+      sessionStorage.setItem('userId', loginData.data.id);
+
       // Aquí podrías redirigir al usuario o hacer otras acciones post-registro
       console.log('Login exitoso:', loginData);
+
+      navigate('/'); // Redirige a la página principal
+
 
 
     } catch (error) {

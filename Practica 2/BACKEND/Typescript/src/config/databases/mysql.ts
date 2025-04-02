@@ -7,15 +7,24 @@ import { File } from '../../models/File';
 
 dotenv.config();
 
+/*
+MYSQL
+hostname: pract2-db.cspigo2o6b5m.us-east-1.rds.amazonaws.com
+puerto: 3306
+username:root
+password:Practica2Semi1
+DefaultSchema:taskflowdb
+database: taskflowdb
+*/ 
+
 // Crear conexión a la base de datos
 export const AppDataSource = new DataSource({
     type: 'mysql',
-    host: process.env.DB_HOST,
-    port: Number(process.env.
-      DB_PORT),
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+    host: 'pract2-db.cspigo2o6b5m.us-east-1.rds.amazonaws.com',
+    port: 3306,
+    username: 'root',
+    password: 'Practica2Semi1',
+    database: 'taskflowdb',
     synchronize: false,
     logging: false,
     entities: [User,Task,File],
