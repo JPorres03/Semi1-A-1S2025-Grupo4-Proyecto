@@ -108,7 +108,11 @@ namespace AspNet.Controllers
 
                 await _context.SaveChangesAsync();
 
-                return Ok(new { Message = "Tarea Completada" });
+                return Ok(new { 
+                    Message = "Task status update successfully", 
+                    Task = tarea,
+                    Error = false
+                });
 
             }catch(Exception ex)
             {
