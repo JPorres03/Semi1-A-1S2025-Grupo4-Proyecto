@@ -10,6 +10,7 @@ interface Task {
   title: string;
   description: string;
   created_at: string;
+  createdAt: string;
   status: boolean;
 }
 
@@ -374,7 +375,7 @@ function Tasks() {
                         {task.title}
                       </span>
                       <small className="text-muted">
-                        Created: {new Date(task.created_at).toLocaleDateString()}
+                        Created: {new Date(task.created_at || task.createdAt ).toLocaleDateString()}
                       </small>
                     </div>
                   </div>
