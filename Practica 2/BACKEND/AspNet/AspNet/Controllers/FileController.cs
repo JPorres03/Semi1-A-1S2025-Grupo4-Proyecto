@@ -56,7 +56,11 @@ namespace AspNet.Controllers
                 {
                     return NotFound(new { Message = "Este usuario no cuenta con archivos" });
                 }
-                return Ok(files);
+                return Ok(new
+                {
+                    files = files,
+                    error = false
+                });
 
             }catch (Exception ex)
             {
