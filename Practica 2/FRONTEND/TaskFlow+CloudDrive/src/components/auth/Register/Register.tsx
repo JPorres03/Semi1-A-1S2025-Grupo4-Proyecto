@@ -18,7 +18,12 @@ function Register() {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const base64String = reader.result as string;
+        let base64String = reader.result as string;
+        // Extraer solo la parte base64 removiendo el prefijo "data:image/xxx;base64,"
+        const commaIndex = base64String.indexOf(',');
+        if (commaIndex !== -1) {
+          base64String = base64String.substring(commaIndex + 1);
+        }
         setProfilePicture(base64String);
       };
       reader.readAsDataURL(file);
