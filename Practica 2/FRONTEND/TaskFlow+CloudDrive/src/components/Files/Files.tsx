@@ -124,7 +124,7 @@ function Files() {
 			};
 
 			const response = await fetch(
-				"https://6dhhgxu6zl.execute-api.us-east-1.amazonaws.com/default/Lambda2_pra1",
+				"https://xf5kbcaya3.execute-api.us-east-1.amazonaws.com/default/Lambda2_pra1",
 				{
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
