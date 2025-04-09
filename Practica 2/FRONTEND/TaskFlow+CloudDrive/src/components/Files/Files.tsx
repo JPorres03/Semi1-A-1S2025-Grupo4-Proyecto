@@ -127,7 +127,6 @@ function Files() {
 				"https://xf5kbcaya3.execute-api.us-east-1.amazonaws.com/default/Lambda2_pra1",
 				{
 					method: "POST",
-					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify(payload),
 				},
 			);

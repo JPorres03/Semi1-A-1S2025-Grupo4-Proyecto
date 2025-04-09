@@ -84,10 +84,7 @@ function Register() {
       console.log('Imagen a enviar:', imageToSend);
 
       const profileResponse = await fetch('https://tdnnd19hzb.execute-api.us-east-1.amazonaws.com/default/Lambda1_pra1', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        method: 'POST',    
         body: JSON.stringify({ 
           id_usuario: registerData.user.id,
           imagen_base64: imageToSend,
