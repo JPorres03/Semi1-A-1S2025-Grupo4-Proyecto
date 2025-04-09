@@ -50,7 +50,7 @@ function Tasks() {
     };
   
     fetchTasks();
-  }, [userId,push]);
+  }, [userId]);
 
   // POST new task to the server - Corregido para evitar pantalla blanca
   const handleAddTask = async (event?: React.FormEvent) => {
@@ -330,7 +330,7 @@ function Tasks() {
 
         {loading ? (
           <div className="text-center py-4">
-            <div className="spinner-border text-primary" role="status">
+            <div className="spinner-border text-primary">
               <span className="visually-hidden text-light">Loading...</span>
             </div>
             <p className="mt-2">Loading tasks...</p>
@@ -355,7 +355,7 @@ function Tasks() {
             onSelect={(e) => setSelectedTaskId(e ? Number(e) : null)}
             alwaysOpen={false}
           >
-            {taskList.filter(task => task && task.id).map((task) => (
+            {taskList.filter(task => task?.id).map((task) => (
               <Accordion.Item
                 eventKey={task.id.toString()}
                 key={task.id}

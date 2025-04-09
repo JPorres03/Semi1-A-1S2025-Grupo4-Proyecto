@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState, type FormEvent, useRef } from 'react';
 import logo from "../../../assets/main-logo-transparent.svg"
 import { ImUserCheck } from "react-icons/im";
 import Swal from 'sweetalert2';
@@ -9,21 +9,33 @@ function Register() {
   const [password, setPassword] = useState('');
   const [confirm_password, setPassword2] = useState('');
   const [email, setEmail] = useState('');
-  const profile_picture_url = 'imagen por defecto';
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setProfilePicture(base64String);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const HandleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     try {
       // Validar que todos los campos estén completos
-      if (!username || !password || !confirm_password || !email || !profile_picture_url) {
+      if (!username || !password || !confirm_password || !email) {
         let campoFaltante = '';
         if (!username) campoFaltante = 'Username';
         else if (!password) campoFaltante = 'Password';
         else if (!confirm_password) campoFaltante = 'Confirm Password';
         else if (!email) campoFaltante = 'Email';
-        else if (!profile_picture_url) campoFaltante = 'Profile picture';
 
         Swal.fire('Error', `The field ${campoFaltante} is empty`, 'error');
         return;
@@ -48,8 +60,7 @@ function Register() {
         username,
         email,
         password,
-        confirm_password,
-        profile_picture_url
+        confirm_password
       };
 
       const registerResponse = await fetch('http://localhost:3001/api/auth/register', {
@@ -66,6 +77,28 @@ function Register() {
       }
 
       const registerData = await registerResponse.json();
+
+      // Si no se seleccionó imagen, usar una por defecto o no enviar
+      const imageToSend = profilePicture || 'imagen_por_defecto_en_base64';
+
+      console.log('Imagen a enviar:', imageToSend);
+
+      const profileResponse = await fetch('https://cnkjsxnnrg.execute-api.us-east-1.amazonaws.com/default/Lambda1_pra1', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          id_usuario: registerData.user.id,
+          imagen_base64: imageToSend,
+          nombre_archivo: `profile_${registerData.user.id}.png`, 
+        }),
+      });
+
+      if (!profileResponse.ok) {
+        const errorData = await profileResponse.json();
+        console.log('Error en la carga de la imagen:', errorData.message || 'Error en la carga de la imagen');
+      }
 
       Swal.fire({
         icon: 'success',
@@ -90,18 +123,29 @@ function Register() {
       <form onSubmit={HandleSubmit}>
         <div className='d-flex flex-column justify-content-center mb-3 align-items-center'>
           <img src={logo} alt="logo" id='logo' />
-          <label className="form-label text-light fs-4">Profile picture</label>
+          <label htmlFor="profilePicture" className="form-label text-light fs-4">Profile picture</label>
           <input
+            id="profilePicture"
+            ref={fileInputRef}
             type="file"
             className='form-control'
             accept="image/*"
+            onChange={handleImageChange}
           />
+          {profilePicture && (
+            <img 
+              src={profilePicture} 
+              alt="Preview" 
+              style={{ width: '100px', height: '100px', borderRadius: '50%', marginTop: '10px' }} 
+            />
+          )}
         </div>
 
         <div className='d-flex justify-content-between mb-3'>
           <div className='mx-3'>
-            <label className="form-label text-light fs-4">Username</label>
+            <label htmlFor="username" className="form-label text-light fs-4">Username</label>
             <input
+              id="username"
               className='form-control'
               type="text"
               value={username}
@@ -110,8 +154,9 @@ function Register() {
             />
           </div>
           <div>
-            <label className="form-label text-light fs-4">Email</label>
+            <label htmlFor="email" className="form-label text-light fs-4">Email</label>
             <input
+              id="email"
               className='form-control'
               type="email"
               value={email}
@@ -123,8 +168,9 @@ function Register() {
 
         <div className='d-flex justify-content-between mb-3'>
           <div className='mx-3'>
-            <label className="form-label text-light fs-4">Password</label>
+            <label htmlFor="password" className="form-label text-light fs-4">Password</label>
             <input
+              id="password"
               className='form-control'
               type="password"
               value={password}
@@ -133,8 +179,9 @@ function Register() {
             />
           </div>
           <div>
-            <label className="form-label text-light fs-4">Confirm password</label>
+            <label htmlFor="confirmPassword" className="form-label text-light fs-4">Confirm password</label>
             <input
+              id="confirmPassword"
               className='form-control'
               type="password"
               value={confirm_password}
