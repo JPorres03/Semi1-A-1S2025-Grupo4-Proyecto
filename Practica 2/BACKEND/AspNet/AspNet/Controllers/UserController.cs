@@ -40,7 +40,6 @@ namespace AspNet.Controllers
                 Username = userDTO.Username,
                 Email = userDTO.Email,
                 Password = hashedPassword,
-                ProfilePictureUrl = userDTO.Profile_Picture_Url
             };
 
             _context.Users.Add(usuario);

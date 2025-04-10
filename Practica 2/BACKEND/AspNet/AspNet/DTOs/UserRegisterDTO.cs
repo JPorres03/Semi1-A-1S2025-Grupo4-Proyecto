@@ -16,7 +16,5 @@ namespace AspNet.DTOs
         [Required]
         [Compare("Password", ErrorMessage = "La contrasena no coinciden")]
         public string Confirm_password { get; set; } = null!;
-
-        public string Profile_Picture_Url { get; set; } = null!;
     }
 }
