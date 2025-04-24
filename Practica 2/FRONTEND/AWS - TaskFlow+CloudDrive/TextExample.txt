@@ -1,0 +1,34 @@
+import Files from "../../Files/Files";
+import Tasks from "../../Tasks/Tasks";
+import Navbar from "../Navbar/Navbar";
+import { useState } from "react";
+
+function Home() {
+  const [content, setContent] = useState<React.ReactNode>(<Tasks />);
+
+  const handleNavbarClick = (option: string) => {
+    switch (option) {
+      case "archivos":
+        setContent(<Files />);
+        break;
+      case "tareas":
+        setContent(<Tasks />);
+        break;
+      default:
+        break;
+    }
+  };
+
+  return (
+    <>
+      <div className="homeContainer d-flex flex-column">
+        <Navbar onNavbarClick={handleNavbarClick} />
+        <div className="mt-5 mx-3">
+          {content}
+        </div>
+      </div>
+    </>
+  );
+}
+
+export default Home;
