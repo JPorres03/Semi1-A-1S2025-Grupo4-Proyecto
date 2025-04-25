@@ -10,6 +10,10 @@
 | Jhonatan Aguilar | 202106003  |
 | Alejandro Perez  | 201712602  |
 
+## Links de la API
+* Link de aws: http://practica2semi1a1s2025paginawebg4.s3-website-us-east-1.amazonaws.com
+* Link de azure: https://semigrupo4.z19.web.core.windows.net/
+
 ## Arquitectura AWS
 
 ![alt text](imgs/arq_aws.png)

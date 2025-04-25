@@ -11,6 +11,8 @@ Este documento explica cómo utilizar las funcionalidades principales de la apli
 
 ### **2.1. Página de Inicio**  
 - La aplicación está disponible en un **sitio web estático** alojado en AWS S3 o Azure Blob Storage.  
+* Link de aws: http://practica2semi1a1s2025paginawebg4.s3-website-us-east-1.amazonaws.com
+* Link de azure: https://semigrupo4.z19.web.core.windows.net/
 
 ### **2.2. Inicio de Sesión**  
 1. Ingrese su **nombre de usuario** y **contraseña**.  
