@@ -68,7 +68,7 @@ function Register() {
         confirm_password
       };
 
-      const registerResponse = await fetch('http://localhost:3001/api/auth/register', {
+      const registerResponse = await fetch('http://4.174.199.137:80/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

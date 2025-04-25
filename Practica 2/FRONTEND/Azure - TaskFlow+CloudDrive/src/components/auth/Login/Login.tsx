@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import img from "../../../assets/space1.jpg"
 import logo from "../../../assets/main-logo-transparent.svg"
 import { RiLoginBoxFill } from "react-icons/ri";
@@ -40,7 +40,7 @@ function Login() {
         password,
       };
 
-      const loginResponse = await fetch('http://localhost:3001/api/auth/login', {
+      const loginResponse = await fetch('http://4.174.199.137:80/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,8 +84,9 @@ function Login() {
       <form onSubmit={handleSubmit}>
         <img src={logo} alt="logo" id='logo' />
         <div className='mb-3'>
-          <label className="form-label text-light fs-3">Username</label>
+          <label htmlFor='username' className="form-label text-light fs-3">Username</label>
           <input
+            id='username'
             className='form-control'
             type="text"
             value={username}
@@ -94,8 +95,9 @@ function Login() {
           />
         </div>
         <div className='mb-3'>
-          <label className="form-label text-light fs-3">Password</label>
+          <label htmlFor='password' className="form-label text-light fs-3">Password</label>
           <input
+            id='password'
             className='form-control'
             type={showPassword ? "text" : "password"} // Cambia el tipo según el estado
             value={password}
@@ -105,17 +107,18 @@ function Login() {
         </div>
         <div className="mb-3 form-check">
           <input
+            id="showPassword"
             type="checkbox"
             className="form-check-input bg-dark"
             checked={showPassword}
             onChange={(e) => setShowPassword(e.target.checked)} // Actualiza el estado cuando el checkbox cambia
           />
-          <label className="form-check-label text-light">Show password</label>
+          <label htmlFor='showPassword' className="form-check-label text-light">Show password</label>
         </div>
         <button type="submit" className="btn btn-primary fs-4"><RiLoginBoxFill /> Login</button>
         <Link to={"/register"} className='mt-3 fs-4 auth' >Don't have an account?</Link>
       </form>
-      <img src={img} alt="space image 1" />
+      <img src={img} alt="space" />
     </div>
   );
 }

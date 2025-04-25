@@ -28,7 +28,7 @@ function Tasks() {
     const fetchTasks = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:3001/api/task/${userId}`);
+        const response = await fetch(`http://4.174.199.137:80/api/task/${userId}`);
         
         if (!response.ok) throw new Error('Failed to fetch tasks');
   
@@ -68,7 +68,7 @@ function Tasks() {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/task/${userId}/create`, {
+      const response = await fetch(`http://4.174.199.137:80/api/task/${userId}/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -132,7 +132,7 @@ function Tasks() {
         )
       );
 
-      const response = await fetch(`http://localhost:3001/api/task/complete/${taskId}`, {
+      const response = await fetch(`http://4.174.199.137:80/api/task/complete/${taskId}`, {
         method: 'PATCH',
       });
 
@@ -205,7 +205,7 @@ function Tasks() {
           )
         );
 
-        const response = await fetch(`http://localhost:3001/api/task/update/${taskId}`, {
+        const response = await fetch(`http://4.174.199.137:80/api/task/update/${taskId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -260,7 +260,7 @@ function Tasks() {
         // Actualización optimista
         setTaskList(prevTasks => prevTasks.filter(task => task.id !== taskId));
 
-        const response = await fetch(`http://localhost:3001/api/task/delete/${taskId}`, {
+        const response = await fetch(`http://4.174.199.137:80/api/task/delete/${taskId}`, {
           method: 'DELETE',
         });
 

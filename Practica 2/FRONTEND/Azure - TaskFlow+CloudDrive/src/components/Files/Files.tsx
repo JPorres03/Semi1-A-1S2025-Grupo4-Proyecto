@@ -30,7 +30,7 @@ function Files() {
 				});
 
 				const response = await fetch(
-					`http://localhost:3001/api/files/${userId}`,
+					`http://4.174.199.137:80/api/files/${userId}`,
 				);
 				if (!response.ok) throw new Error("Failed to fetch files");
 
