@@ -125,19 +125,30 @@ Ambos usuarios tienen exactamente los mismos permisos:
 ## Capturas de pantalla de los recursos utilizados
 ### AWS
 #### 1. **Buckets de Amazon S3**
+![alt text](imgs/s3.jpg)
 #### 2. **Instancias de EC2**
+![alt text](imgs/ec2.jpg)
 #### 3. **Balanceador de carga de EC2**
+![alt text](imgs/loadbalancer.jpg)
 #### 4. **Base de datos de RDS**
+![alt text](imgs/rds.jpg)
 #### 5. **Funciones Lambda**
+![alt text](imgs/lambda.jpg)
 #### 6. **Configuración de Api Gateway**
+![alt text](imgs/gateway.jpg)
 
 ### Azure
 
 #### 1. **Blob Containers de Azure**
+![alt text](imgs/blobContainers.jpg)
 #### 2. **Instancias de VM de Azure**
+![alt text](imgs/VM.jpg)
 #### 3. **Balanceador de carga de Azure**
+![alt text](imgs/azureLoadBalancer.jpg)
 #### 4. **Funciones de Azure Functions**
+![alt text](imgs/Functions.jpg)
 #### 5. **Configuración de Api Management**
+![alt text](imgs/ApiManagement.jpg)
 
 ## Diferencia entre arquitectura con **AWS** y **Azure**
 
