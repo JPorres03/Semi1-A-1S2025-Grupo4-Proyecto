@@ -94,6 +94,9 @@ Desarrollar una plataforma innovadora llamada **LinguaVision** que aproveche los
   - Compatibilidad con SQL para consultas complejas (ej: filtrar traducciones por fecha).  
   - Encriptación de datos en reposo y tránsito.  
 
+**Diagrama de la base de datos implementada**
+![alt text](<img/Semi Proyecto.png>)
+
 ---
 
 #### **2. Servicios Obligatorios**  
@@ -179,12 +182,13 @@ graph TD
     A[Usuario sube imagen/audio] --> B(S3 Bucket)
     B --> C{Lambda Trigger}
     C -->|Imagen| D[Rekognition]
-    C -->|Audio| E[Transcribe]
-    D --> F[Translate]
-    E --> F
-    F --> G[Polly]
-    G --> H[(RDS: Guardar resultados)]
-    H --> I[Frontend: Mostrar texto/audio]
+    D -->|Texto| E[Translate]
+    E -->|Traduccion| F[Polly]
+    F -->|Audio| G[Transcribe]
+    G -->|Procesar audio| H[Frontend]
+    H -->|Guardar informacion| K[Backend]
+    K --> I[(RDS: Guardar resultados)]
+    H --> J[Frontend: Mostrar texto/audio]
 ```  
 
 **Nota**: Todos los servicios están enlazados mediante IAM roles con permisos mínimos necesarios (principio de least privilege).
