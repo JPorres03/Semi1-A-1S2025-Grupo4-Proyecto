@@ -1,0 +1,125 @@
+
+.bg-login
+    background-image: url('../assets/flags.webp')
+    background-size: cover
+    background-position: center
+    background-repeat: no-repeat
+    background-attachment: fixed
+
+    background-color: #f0f0f0
+    image-rendering: -webkit-optimize-contrast
+    image-rendering: crisp-edges
+
+    width: 100vw
+    height: 100vh
+    position: fixed
+    top: 0
+    left: 0
+    z-index: -1
+.bg-login-form
+    background-color: #ffffff80
+    h1
+        font-size: 2.5rem
+        font-weight: 600
+        color: #000000
+        text-align: center
+        margin-bottom: 1rem
+        img
+            width: 50px
+            height: 50px
+            margin-bottom: 1rem
+    .btn-login
+        background-color: #0D92F4
+        color: #ffffff
+        border: none
+        padding: 0.5rem 1rem
+        font-size: 1rem
+        cursor: pointer
+        border-radius: 5px
+        transition: background-color 0.3s ease-in-out
+        &:hover
+            background-color: #0056b3
+    .btn-register
+        background-color: #C62E2E
+        color: #ffffff
+        border: none
+        padding: 0.5rem 1rem
+        font-size: 1rem
+        cursor: pointer
+        border-radius: 5px
+        transition: background-color 0.3s ease-in-out
+        &:hover
+            background-color: #F95454
+
+.container-register
+    background-color: #A1D6CB
+    display: flex
+
+    img
+        height: 100vh
+    .container-register-form
+        width: 100%
+        display: flex
+        flex-direction: column
+        justify-content: center
+        align-items: center
+        h1
+            font-size: 2.5rem
+            font-weight: 600
+            color: #000000
+            text-align: center
+            margin-bottom: 1rem
+            img
+                width: 50px
+                height: 50px
+                margin-bottom: 1rem
+        .btn-login
+            background-color: #0D92F4
+            color: #ffffff
+            border: none
+            padding: 0.5rem 1rem
+            font-size: 1rem
+            cursor: pointer
+            border-radius: 5px
+            transition: background-color 0.3s ease-in-out
+            &:hover
+                background-color: #0056b3
+        .btn-register
+            background-color: #C62E2E
+            color: #ffffff
+            border: none
+            padding: 0.5rem 1rem
+            font-size: 1rem
+            cursor: pointer
+            border-radius: 5px
+            transition: background-color 0.3s ease-in-out
+            &:hover
+                background-color: #F95454
+
+.container-navbar
+    background-color: #A4B465
+    width: 100vw
+    height: 150px
+    display: grid
+    grid-template-columns: 1fr 1fr
+    justify-content: space-between
+    align-items: center
+    img
+        width: 80px
+        height: 80px
+        margin-bottom: 1rem
+    .navbar-buttons
+        display: flex
+        justify-content: flex-end
+        align-items: center
+        margin-right: 2rem
+        button
+            background-color: #A94A4A
+            color: #ffffff
+            &:hover
+                background-color: #C62E2E
+                transform: scale(1.1)
+.container-main
+    background-color: #A1D6CB
+    width: 100vw
+    height: calc( 100vh - 150px)
