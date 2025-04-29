@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useApi } from "../../../contexts";
 import { useNavigate } from "react-router-dom";
 import { IoLogIn } from "react-icons/io5";
-import { IoIosCreate } from "react-icons/io";
 import logo from "../../../assets/logo.webp";
+import { IoArrowBack } from "react-icons/io5";
 
 function Login() {
 	const [email, setEmail] = useState("");
@@ -70,7 +70,7 @@ function Login() {
 				</div>
 				<div className="d-flex justify-content-around align-items-center">
 					<button className="btn w-25 fs-5 btn-register" type="button" onClick={() => navigate("/register")}>
-                    Register <IoIosCreate />
+                    <IoArrowBack /> Register
                     </button>
 					<button className="btn w-25 fs-5 btn-login" type="submit">
                     <IoLogIn /> Login

@@ -2,9 +2,9 @@ import img from "../../../assets/flags2.webp";
 import logo from "../../../assets/logo.webp";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { IoLogIn } from "react-icons/io5";
 import { IoIosCreate } from "react-icons/io";
 import { useApi } from "../../../contexts/ApiProvider";
+import { IoArrowBack } from "react-icons/io5";
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -102,7 +102,7 @@ function Register() {
             onClick={() => navigate("/login")}
             disabled={isLoading}
           >
-            <IoLogIn /> Login
+            <IoArrowBack /> Login
           </button>
           <button 
             className="btn w-25 fs-5 btn-register" 

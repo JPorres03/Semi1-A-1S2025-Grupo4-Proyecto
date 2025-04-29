@@ -4,7 +4,11 @@ import { LuFiles } from "react-icons/lu";
 import { CgLogOut } from "react-icons/cg";
 import { useNavigate } from "react-router-dom";
 
-function Navbar() {
+interface NavbarProps {
+  onNavClick: (option: string) => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onNavClick }) => {
   const navigate = useNavigate();
 
 	return (
@@ -14,10 +18,10 @@ function Navbar() {
 				LinguaVision
 			</h1>
 			<div className="navbar-buttons">
-        <button type="button" className="btn mx-3 fs-4">
+        <button type="button" className="btn mx-3 fs-4" onClick={() => {onNavClick('upload')}}>
           Upload <FaCloudUploadAlt />
         </button>
-        <button type="button" className="btn mx-3 fs-4">
+        <button type="button" className="btn mx-3 fs-4" onClick={() => {onNavClick('files')}}>
           Files <LuFiles />
         </button>
         <button type="button" className="btn mx-3 fs-4" onClick={() => {navigate('/login')}}>
