@@ -3,7 +3,6 @@ import logo from "../../../assets/logo.webp";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoIosCreate } from "react-icons/io";
-import { useApi } from "../../../contexts/ApiProvider";
 import { IoArrowBack } from "react-icons/io5";
 
 function Register() {
@@ -13,7 +12,27 @@ function Register() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { register } = useApi();
+
+  // Función para registrar al usuario
+  const register = async (username: string, email: string, password: string) => {
+    const response = await fetch("http://localhost:3000/api/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ username, email, password })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Error al registrar usuario");
+    }
+
+    const data = await response.json();
+    // Guarda los datos del usuario en sessionStorage
+    sessionStorage.setItem("user", JSON.stringify(data));
+    return data;
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +41,7 @@ function Register() {
 
     try {
       await register(username, email, password);
-      navigate("/dashboard"); // Redirige después de registro exitoso
+      navigate("/");
     } catch (error: unknown) {
       if (error instanceof Error) {
         setError(error.message || "Error en el registro");
