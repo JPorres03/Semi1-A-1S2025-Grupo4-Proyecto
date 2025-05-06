@@ -2,12 +2,9 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../config/database/config";
 import { User } from "../models/User.models";
 import * as crypto from "crypto";
-
 import { awsCognitoKey } from "../utils/credential.utils";
-import aws from 'aws-sdk';
 import { decode } from 'jsonwebtoken';
 import {CognitoUserAttribute, CognitoUserPool, AuthenticationDetails, CognitoUser} from 'amazon-cognito-identity-js';
-import { DataSource } from "typeorm";
 
 const userPool = new CognitoUserPool(awsCognitoKey.cognito);
 
