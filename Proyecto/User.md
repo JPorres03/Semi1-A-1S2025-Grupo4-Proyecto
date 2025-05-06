@@ -19,51 +19,52 @@ Este documento tiene como objetivo:
 
 ---
 
-## **3. Pasos para Utilizar la Aplicación**  
+## **3. Uso de la Aplicación**  
 
-### **Paso 1: Registro e Inicio de Sesión**  
+### **Registro e Inicio de Sesión**  
 1. Accede a la página web de LinguaVision.  
 2. Haz clic en **"Registrarse"** si eres nuevo o **"Iniciar Sesión"** si ya tienes una cuenta.  
 3. Completa el formulario con tu correo y contraseña (o usa Google/Facebook con Amazon Cognito).  
 
-![Captura: Pantalla de registro](https://ejemplo.com/registro.png)  
+**LOGIN**
+![alt text](img/login.png)
+
+
+**REGISTRO**
+![alt text](img/registro.png)
 
 ---
 
-### **Paso 2: Subir Imagen o Audio**  
-1. En el dashboard, selecciona **"Subir Archivo"**.  
-2. Elige entre:  
-   - **Imagen** (JPEG, PNG) para extraer texto.  
-   - **Audio** (MP3, WAV) para transcribir y traducir.  
+### **Adquirir texto de imagen**  
+1. En el dashboard, selecciona **"Rekognition"**.  
+2. Sube la imagen
 3. Haz clic en **"Procesar"**.  
 
-![Captura: Selección de archivo](https://ejemplo.com/subir-archivo.png)  
+![alt text](img/rekognition.png)
 
 ---
 
-### **Paso 3: Seleccionar Idioma de Destino**  
-1. Elige el idioma al que deseas traducir el texto (ej: español → inglés).  
-2. Opcional: Activa la opción **"Convertir a Voz"** si quieres un archivo de audio.  
-3. Confirma con **"Traducir"**.  
+### **Traducir texto**  
+1. En el dashboard, selecciona **"Translate"**.  
+2. Elige el idioma al que deseas traducir el texto (ej: español → inglés).  
+3. Ingresa el texto.
+4. Confirma con **"Traducir"**.  
 
-![Captura: Selección de idioma](https://ejemplo.com/idioma.png)  
+![alt text](img/translate.png)
+---
+
+### **Generar audio y descargarlo**  
+1. En el dashboard, selecciona **"Polly"**.
+2. Ingresa el texto y haz click en procesar.
+3. Da click en reproducir y si deseas en el boton "Descargar audio".    
+
+![alt text](img/polly.png)
 
 ---
 
-### **Paso 4: Ver y Descargar Resultados**  
-1. En la sección **"Mis Traducciones"**, encontrarás:  
-   - **Texto extraído** y su traducción.  
-   - **Archivo de audio** (si se solicitó).  
-2. Descarga los resultados en formato **TXT** o **MP3**.  
-
-![Captura: Resultados](https://ejemplo.com/resultados.png)  
-
----
-
-### **Funciones Adicionales**  
-- **Historial**: Revisa traducciones anteriores en tu perfil.  
-- **Personalización**: Ajusta la velocidad/tono de las voces de Polly.  
-- **Seguridad**: Borra archivos manualmente desde S3.  
+### **Extraer texto de audio**  
+1. En el dashboard, selecciona **"Transcribe"**.
+2. Ingresa el audio y haz click en procesar.
 
 ---
 
