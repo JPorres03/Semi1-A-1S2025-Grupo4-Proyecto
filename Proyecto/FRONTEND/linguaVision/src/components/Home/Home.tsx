@@ -4,8 +4,16 @@ import { useState } from "react";
 import Translate from "./Translate/Translate";
 import Polly from "./Polly/Polly";
 import Transcribe from "./Transcribe/Transcribe";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
+
+	const navigate = useNavigate();
+	const user = sessionStorage.getItem("user");
+	if (!user) {
+		navigate("/login");
+	}
+
 	const [content, setContent] = useState<React.ReactNode>(<Main />);
 
 	const handleNavClick = (option: string) => {
