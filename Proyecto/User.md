@@ -66,6 +66,8 @@ Este documento tiene como objetivo:
 1. En el dashboard, selecciona **"Transcribe"**.
 2. Ingresa el audio y haz click en procesar.
 
+![alt text](img/transcribe.png)
+
 ---
 
 ## **4. Soporte Técnico**  
