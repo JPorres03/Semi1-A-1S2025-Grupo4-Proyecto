@@ -7,6 +7,18 @@ function Translate() {
   const [translatedText, setTranslatedText] = useState("");
   const [isTranslating, setIsTranslating] = useState(false);
   const [error, setError] = useState("");
+  const [targetLanguage, setTargetLanguage] = useState("en"); // Idioma por defecto: inglés
+
+  const languageOptions = [
+    { code: "en", name: "English" },
+    { code: "es", name: "Spanish" },
+    { code: "fr", name: "French" },
+    { code: "de", name: "German" },
+    { code: "it", name: "Italian" },
+    { code: "pt", name: "Portuguese" },
+    { code: "ja", name: "Japanese" },
+    { code: "zh", name: "Chinese" },
+  ];
 
   const handleSubmit = async () => {
     if (!inputText.trim()) {
@@ -22,18 +34,13 @@ function Translate() {
     setError("");
 
     try {
-      // Simulate API call for translation
-      // Replace this with your actual translation API call
       const response = await fetch(
-        "https://your-translation-api-endpoint.com/translate",
+        "https://u3a27iijvi.execute-api.us-east-2.amazonaws.com/default/semi1lambda2",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify({
             text: inputText,
-            target_language: "es", // Example: translate to Spanish
+            targetLanguage: targetLanguage,
           }),
         }
       );
@@ -68,8 +75,32 @@ function Translate() {
       <div className="container mt-4 bg-light">
         <h2 className="text-center mb-4">Text Translation</h2>
 
+        {/* Selector de idioma */}
+        <div className="row mb-4">
+          <div className="col-md-6 offset-md-3">
+            <div className="form-group">
+              <label htmlFor="languageSelect" className="form-label">
+                Target Language:
+              </label>
+              <select
+                id="languageSelect"
+                className="form-select"
+                value={targetLanguage}
+                onChange={(e) => setTargetLanguage(e.target.value)}
+                disabled={isTranslating}
+              >
+                {languageOptions.map((lang) => (
+                  <option key={lang.code} value={lang.code}>
+                    {lang.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
         <div className="row">
-          {/* Left column for input text */}
+          {/* Columna izquierda para el texto original */}
           <div className="col-md-6">
             <div className="p-4 border rounded-3" style={{ minHeight: "300px" }}>
               <h4 className="mb-3">Original Text:</h4>
@@ -97,10 +128,10 @@ function Translate() {
             </div>
           </div>
 
-          {/* Right column for translated text */}
+          {/* Columna derecha para el texto traducido */}
           <div className="col-md-6">
             <div className="p-4 bg-white border rounded-3" style={{ minHeight: "300px" }}>
-              <h4 className="mb-3">Translation:</h4>
+              <h4 className="mb-3">Translation ({languageOptions.find(lang => lang.code === targetLanguage)?.name}):</h4>
               {isTranslating ? (
                 <div className="d-flex align-items-center justify-content-center" style={{ height: "200px" }}>
                   <div className="text-center">
@@ -108,7 +139,7 @@ function Translate() {
 <div className="spinner-border text-primary" role="status">
                       <span className="visually-hidden">Translating...</span>
                     </div>
-                    <p>Translating text...</p>
+                    <p>Translating text to {languageOptions.find(lang => lang.code === targetLanguage)?.name}...</p>
                   </div>
                 </div>
               ) : translatedText ? (

@@ -15,7 +15,7 @@ function Register() {
 
   // Función para registrar al usuario
   const register = async (username: string, email: string, password: string) => {
-    const response = await fetch("http://localhost:3000/api/register", {
+    const response = await fetch("http://BalanceadorProyecto1-402882467.us-east-1.elb.amazonaws.com:80/auth/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

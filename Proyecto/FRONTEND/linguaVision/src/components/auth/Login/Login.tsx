@@ -11,7 +11,7 @@ function Login() {
   const navigate = useNavigate();
 
   const login = async (email: string, password: string) => {
-    const response = await fetch("http://localhost:3000/api/login", {
+    const response = await fetch("http://BalanceadorProyecto1-402882467.us-east-1.elb.amazonaws.com:80/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
